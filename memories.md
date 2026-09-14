@@ -25,11 +25,12 @@
 ## AI Workflow Rules (Important!)
 
 ### Task Breakdown + Progress Updates
-- AI must break down complex tasks into small, visible steps
-- Show a todo list to the user BEFORE starting work
-- Update the todo list in real-time as each step completes
-- Add ETA for each task (even if rough estimate)
-- User should ALWAYS know: what's being done, what's done, what's next, how long it'll take
+- AI MUST use the TodoWrite tool (the visible todo list on screen) for EVERY multi-step task
+- Before starting work: create todo list with all steps
+- While working: update status in real-time (pending → in_progress → completed)
+- User should ALWAYS see the todo list updating on the right side of the screen
+- This is the ONLY way user knows if AI is working, stuck, or done
+- If a task takes > 2 minutes, give a mid-point update in chat too
 
 ### Why?
 - Sometimes user doesn't know if AI is lagging, stuck, working, or disconnected
