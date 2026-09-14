@@ -201,42 +201,70 @@ class _SpinScreenState extends State<SpinScreen> {
   }
 
   Widget _buildMainContent() {
-    return Column(
+    final textColor = _isDarkMode ? Colors.white.withValues(alpha: 0.92) : const Color(0xFF1A1A2E);
+
+    return Stack(
       children: [
-        // Card stack with pointer
-        Expanded(
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              // Task wheel
-              CategoryCardWheel(
-                key: _wheelKey,
-                categories: _categories,
-                selectedCategoryIds: _selectedCategoryIds,
-                selectedTiers: _selectedTiers,
-                onCenterChanged: (index) {
-                  // Task changed in center
-                },
+        Column(
+          children: [
+            // Card stack with pointer
+            Expanded(
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  // Task wheel
+                  CategoryCardWheel(
+                    key: _wheelKey,
+                    categories: _categories,
+                    selectedCategoryIds: _selectedCategoryIds,
+                    selectedTiers: _selectedTiers,
+                    onCenterChanged: (index) {
+                      // Task changed in center
+                    },
+                  ),
+                  // Pointer at bottom
+                  Positioned(
+                    bottom: 20,
+                    child: Transform.rotate(
+                      angle: 0,
+                      child: const WheelPointer(),
+                    ),
+                  ),
+                ],
               ),
-              // Pointer at bottom
-              Positioned(
-                bottom: 20,
-                child: Transform.rotate(
-                  angle: 0,
-                  child: const WheelPointer(),
+            ),
+
+            // Spin button
+            SpinButton(
+              isSpinning: _isSpinning,
+              onPressed: _handleSpin,
+            ),
+
+            const SizedBox(height: 20),
+          ],
+        ),
+
+        // Menu button (top-right)
+        Positioned(
+          top: 8,
+          right: 8,
+          child: SafeArea(
+            child: Material(
+              color: Colors.transparent,
+              child: IconButton(
+                icon: Icon(
+                  Icons.menu,
+                  color: textColor,
+                  size: 26,
                 ),
+                onPressed: () {
+                  _scaffoldKey.currentState?.openEndDrawer();
+                },
+                splashRadius: 24,
               ),
-            ],
+            ),
           ),
         ),
-
-        // Spin button
-        SpinButton(
-          isSpinning: _isSpinning,
-          onPressed: _handleSpin,
-        ),
-
-        const SizedBox(height: 20),
       ],
     );
   }
