@@ -258,13 +258,13 @@ class AppDrawer extends StatelessWidget {
   Widget _buildTierRow(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
+      child: Column(
         children: [
-          Expanded(child: _buildTierChip('Soft', 'soft', context)),
-          const SizedBox(width: 8),
-          Expanded(child: _buildTierChip('Kink', 'kink', context)),
-          const SizedBox(width: 8),
-          Expanded(child: _buildTierChip('Entertainment', 'entertainment', context)),
+          _buildTierChip('Soft', 'soft', context),
+          const SizedBox(height: 8),
+          _buildTierChip('Kink', 'kink', context),
+          const SizedBox(height: 8),
+          _buildTierChip('Entertainment', 'entertainment', context),
         ],
       ),
     );
@@ -315,15 +315,24 @@ class AppDrawer extends StatelessWidget {
                 : Colors.white.withValues(alpha: 0.15),
           ),
         ),
-        child: Center(
-          child: Text(
-            label,
-            style: TextStyle(
-              color: selected ? Colors.white : Colors.white38,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
+        child: Row(
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                color: selected ? Colors.white : Colors.white38,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
+            const Spacer(),
+            if (selected)
+              const Icon(
+                Icons.check_circle,
+                color: Color(0xFF4ECDC4),
+                size: 16,
+              ),
+          ],
         ),
       ),
     );
