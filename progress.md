@@ -44,3 +44,7 @@
 ## 2026-09-14 14:30 â€” Yuna Â· Logic â€” Snackbar on last category deselect, multi-select tier, new 2 Player category
 - Changed: `lib/widgets/app_drawer.dart` (Snackbar on last category/tier deselect, multi-tier chips, 'two_player' shortName), `lib/screens/spin_screen.dart` (List<String> _selectedTiers, Hive persistence), `lib/widgets/category_card_wheel.dart` (selectedTiers, combined tier task pool), `lib/data/category_colors.dart` (two_player color), `task.json` (2 Player category with soft/kink/entertainment tasks)
 - Verified: `flutter analyze` â€” 0 issues, `flutter run` on emulator-5554 â€” app builds and launches successfully
+
+## 2026-09-14 14:00 — Yuna · Logic — Custom snackbar widget + tier descriptions in drawer
+- Changed: lib/widgets/custom_snackbar.dart (created), lib/widgets/app_drawer.dart (import, tierDescriptions map, chip layout, snackbar replacements)
+- Verified: flutter analyze — No issues found; flutter run — built and launched on emulator-5554

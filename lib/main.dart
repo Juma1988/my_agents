@@ -10,6 +10,8 @@ void main() async {
   runApp(const MyApp());
 }
 
+final bool isDebug = true;
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -17,7 +19,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'The Spin',
-      debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: isDebug,
       theme: ThemeData.dark().copyWith(scaffoldBackgroundColor: const Color(0xFF1A1A2E)),
       home: const SpinScreen(),
     );

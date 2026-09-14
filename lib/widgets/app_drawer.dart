@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/challenge_category.dart';
 import '../data/category_colors.dart';
+import 'custom_snackbar.dart';
 
 /// Drawer panel containing category selection, tier selection, and settings.
 class AppDrawer extends StatelessWidget {
@@ -36,26 +37,20 @@ class AppDrawer extends StatelessWidget {
     'two_player': '2Ply',
   };
 
+  /// Descriptions for each tier
+  static const Map<String, String> tierDescriptions = {
+    'soft': 'Light fun, flirty, tame tasks',
+    'kink': 'Spicy, intimate, boundary-pushing',
+    'entertainment': 'Bold, wild, anything-goes tasks',
+  };
+
   void _toggleCategory(String categoryId, BuildContext context) {
     final newSelection = List<String>.from(selectedCategoryIds);
 
     if (newSelection.contains(categoryId)) {
       // Don't allow deselecting the last one
       if (newSelection.length <= 1) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text(
-              'At least one category must stay selected',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            backgroundColor: const Color(0xFF4ECDC4),
-            duration: const Duration(seconds: 2),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        AppSnackBar.show(context, 'At least one category must stay selected');
         return;
       }
       newSelection.remove(categoryId);
@@ -279,20 +274,7 @@ class AppDrawer extends StatelessWidget {
         if (newTiers.contains(tier)) {
           // Don't allow deselecting the last tier
           if (newTiers.length <= 1) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text(
-                  'At least one tier must stay selected',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                backgroundColor: const Color(0xFF4ECDC4),
-                duration: const Duration(seconds: 2),
-                behavior: SnackBarBehavior.floating,
-              ),
-            );
+            AppSnackBar.show(context, 'At least one tier must stay selected');
             return;
           }
           newTiers.remove(tier);
@@ -316,21 +298,40 @@ class AppDrawer extends StatelessWidget {
           ),
         ),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              label,
-              style: TextStyle(
-                color: selected ? Colors.white : Colors.white38,
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      color: selected ? Colors.white : Colors.white38,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    tierDescriptions[tier] ?? '',
+                    style: GoogleFonts.inter(
+                      color: Colors.white38,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ],
               ),
             ),
-            const Spacer(),
             if (selected)
-              const Icon(
-                Icons.check_circle,
-                color: Color(0xFF4ECDC4),
-                size: 16,
+              const Padding(
+                padding: EdgeInsets.only(top: 2),
+                child: Icon(
+                  Icons.check_circle,
+                  color: Color(0xFF4ECDC4),
+                  size: 16,
+                ),
               ),
           ],
         ),
