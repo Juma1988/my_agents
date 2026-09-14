@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../models/challenge_category.dart';
 import '../models/challenge_segment.dart';
 import '../data/category_colors.dart';
+import '../theme/app_colors.dart';
 
 /// A flat item combining a task with its parent category for the wheel.
 class TaskCardItem {
@@ -53,6 +54,7 @@ class CategoryCardWheelState extends State<CategoryCardWheel> {
   final ValueNotifier<int> _pulseTick = ValueNotifier<int>(0);
   int _pulseRealIndex = -1;
   final math.Random _random = math.Random();
+  int _lastTickedIndex = -1;
 
   static const int _multiplier = 10000;
 
@@ -124,6 +126,23 @@ class CategoryCardWheelState extends State<CategoryCardWheel> {
     }
 
     _rolling = true;
+
+    // Add listener for haptic ticks during spin
+    void tickListener() {
+      final pool = _taskPool;
+      if (pool.isEmpty) return;
+      final currentCenter = (_controller.offset / (TaskCard.cardHeight + 16)).round();
+      final currentReal = _realIndex(currentCenter);
+      if (currentReal != _lastTickedIndex && _lastTickedIndex != -1) {
+        _lastTickedIndex = currentReal;
+        HapticFeedback.selectionClick();
+      }
+      _lastTickedIndex = currentReal;
+    }
+
+    _controller.addListener(tickListener);
+    _lastTickedIndex = _realIndex(_controller.selectedItem);
+
     await _controller
         .animateToItem(
           landingVirtual,
@@ -131,6 +150,7 @@ class CategoryCardWheelState extends State<CategoryCardWheel> {
           curve: Curves.easeOutCubic,
         )
         .whenComplete(() {
+      _controller.removeListener(tickListener);
       _rolling = false;
       if (!mounted) return;
       HapticFeedback.mediumImpact();
@@ -165,12 +185,23 @@ class CategoryCardWheelState extends State<CategoryCardWheel> {
     final pool = _taskPool;
     if (pool.isEmpty) {
       return Center(
-        child: Text(
-          'No tasks available',
-          style: GoogleFonts.inter(
-            color: Colors.white.withValues(alpha: 0.5),
-            fontSize: 16,
-          ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.casino_outlined,
+              color: Colors.white24,
+              size: 48,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Select categories to play',
+              style: GoogleFonts.inter(
+                color: Colors.white54,
+                fontSize: 16,
+              ),
+            ),
+          ],
         ),
       );
     }
@@ -323,8 +354,8 @@ class TaskCard extends StatelessWidget {
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
         colors: [
-          const Color(0xFF1E1E2E).withValues(alpha: 0.95),
-          const Color(0xFF16162A).withValues(alpha: 0.98),
+          AppColors.surface.withValues(alpha: 0.95),
+          AppColors.surfaceAlt.withValues(alpha: 0.98),
         ],
       ),
       border: Border.all(

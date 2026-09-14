@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'screens/spin_screen.dart';
+import 'theme/app_colors.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'The Spin',
       debugShowCheckedModeBanner: isDebug,
-      theme: ThemeData.dark().copyWith(scaffoldBackgroundColor: const Color(0xFF1A1A2E)),
+      theme: ThemeData.dark().copyWith(scaffoldBackgroundColor: AppColors.background),
       home: const SpinScreen(),
     );
   }

@@ -3,23 +3,16 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/challenge_category.dart';
 import '../data/category_colors.dart';
+import '../theme/app_colors.dart';
 import 'custom_snackbar.dart';
 
-/// Drawer panel containing category selection, tier selection, settings, and profiles.
+/// Drawer panel containing category selection, tier selection, and profiles.
 class AppDrawer extends StatelessWidget {
   final List<ChallengeCategory> categories;
   final List<String> selectedCategoryIds;
   final ValueChanged<List<String>> onSelectionChanged;
   final List<String> selectedTiers;
   final ValueChanged<List<String>> onTierChanged;
-  final bool isDarkMode;
-  final ValueChanged<bool> onDarkModeChanged;
-
-  // Settings
-  final bool soundEffects;
-  final ValueChanged<bool> onSoundEffectsChanged;
-  final bool hapticFeedback;
-  final ValueChanged<bool> onHapticFeedbackChanged;
 
   // Player profiles
   final String player1Nickname;
@@ -38,12 +31,6 @@ class AppDrawer extends StatelessWidget {
     required this.onSelectionChanged,
     required this.selectedTiers,
     required this.onTierChanged,
-    required this.isDarkMode,
-    required this.onDarkModeChanged,
-    this.soundEffects = true,
-    required this.onSoundEffectsChanged,
-    this.hapticFeedback = true,
-    required this.onHapticFeedbackChanged,
     this.player1Nickname = 'Player 1',
     this.player2Nickname = 'Player 2',
     this.player1Avatar = '😈',
@@ -63,17 +50,6 @@ class AppDrawer extends StatelessWidget {
     'sensation': 'Sen',
     'wildcard': 'Wil',
     'two_player': '2Ply',
-  };
-
-  /// Descriptions for each category
-  static const Map<String, String> categoryDescriptions = {
-    'domestic': 'House chores with a twist',
-    'dirty_truth': 'Dare to tell the truth',
-    'spicy_dare': 'Bold dares, no backing down',
-    'roleplay': 'Pretend, pretend, enjoy',
-    'sensation': 'Touch, feel, lose control',
-    'wildcard': 'Surprise, anything goes',
-    'two_player': 'Couple tasks, double the fun',
   };
 
   /// Available avatars for player profiles
@@ -125,8 +101,8 @@ class AppDrawer extends StatelessWidget {
             enabledBorder: UnderlineInputBorder(
               borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
             ),
-            focusedBorder: const UnderlineInputBorder(
-              borderSide: BorderSide(color: Color(0xFF4ECDC4)),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: AppColors.accent),
             ),
           ),
           autofocus: true,
@@ -149,7 +125,7 @@ class AppDrawer extends StatelessWidget {
               }
               Navigator.of(ctx).pop();
             },
-            child: const Text('Save', style: TextStyle(color: Color(0xFF4ECDC4))),
+            child: Text('Save', style: TextStyle(color: AppColors.accent)),
           ),
         ],
       ),
@@ -200,12 +176,12 @@ class AppDrawer extends StatelessWidget {
                     duration: const Duration(milliseconds: 200),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? const Color(0xFF4ECDC4).withValues(alpha: 0.3)
+                          ? AppColors.accent.withValues(alpha: 0.3)
                           : Colors.white.withValues(alpha: 0.05),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: isSelected
-                            ? const Color(0xFF4ECDC4)
+                            ? AppColors.accent
                             : Colors.white.withValues(alpha: 0.1),
                         width: isSelected ? 2 : 1,
                       ),
@@ -226,7 +202,7 @@ class AppDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: const Color(0xFF16162A),
+      backgroundColor: AppColors.surfaceAlt,
       child: SafeArea(
         child: Column(
           children: [
@@ -253,23 +229,20 @@ class AppDrawer extends StatelessWidget {
 
                   // Tier section
                   _buildSectionLabel('TIER'),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Text(
+                      'Select one or more',
+                      style: GoogleFonts.inter(
+                        color: Colors.white38,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w400,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 10),
                   _buildTierRow(context),
-
-                  const SizedBox(height: 20),
-                  const Divider(color: Colors.white12, height: 1),
-                  const SizedBox(height: 20),
-
-                  // Settings section
-                  _buildSectionLabel('SETTINGS'),
-                  const SizedBox(height: 10),
-                  _buildDarkModeToggle(),
-                  const SizedBox(height: 8),
-                  _buildSoundEffectsToggle(),
-                  const SizedBox(height: 8),
-                  _buildHapticFeedbackToggle(),
-                  const SizedBox(height: 8),
-                  _buildHistoryItem(context),
 
                   const SizedBox(height: 20),
                   const Divider(color: Colors.white12, height: 1),
@@ -325,7 +298,7 @@ class AppDrawer extends StatelessWidget {
               const Text('🎰', style: TextStyle(fontSize: 28)),
               const SizedBox(width: 10),
               Text(
-                'Handicap',
+                'Risk Roulette',
                 style: GoogleFonts.inter(
                   color: Colors.white,
                   fontSize: 22,
@@ -372,71 +345,62 @@ class AppDrawer extends StatelessWidget {
           final isSelected = selectedCategoryIds.contains(cat.id);
           final color = CategoryColors.get(cat.id);
           final shortName = shortNames[cat.id] ?? cat.name.substring(0, 3);
-          final description = categoryDescriptions[cat.id] ?? '';
 
           return Padding(
             padding: const EdgeInsets.only(bottom: 8),
-            child: GestureDetector(
-              onTap: () {
-                HapticFeedback.selectionClick();
-                _toggleCategory(cat.id, context);
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                curve: Curves.easeOutCubic,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? color.withValues(alpha: 0.25)
-                      : Colors.white.withValues(alpha: 0.05),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
+            child: Semantics(
+              label: 'Select ${cat.name}',
+              toggled: isSelected,
+              child: GestureDetector(
+                onTap: () {
+                  HapticFeedback.selectionClick();
+                  _toggleCategory(cat.id, context);
+                },
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeOutCubic,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12, vertical: 10),
+                  decoration: BoxDecoration(
                     color: isSelected
-                        ? color.withValues(alpha: 0.7)
-                        : Colors.white.withValues(alpha: 0.1),
-                    width: isSelected ? 2 : 1,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    // Icon
-                    Text(cat.icon, style: const TextStyle(fontSize: 20)),
-                    const SizedBox(width: 12),
-                    // Name + description
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            shortName,
-                            style: GoogleFonts.inter(
-                              color: isSelected
-                                  ? Colors.white
-                                  : Colors.white.withValues(alpha: 0.6),
-                              fontSize: 13,
-                              fontWeight:
-                                  isSelected ? FontWeight.w700 : FontWeight.w500,
-                            ),
-                          ),
-                          Text(
-                            description,
-                            style: GoogleFonts.inter(
-                              color: Colors.white38,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ? color.withValues(alpha: 0.25)
+                        : Colors.white.withValues(alpha: 0.05),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isSelected
+                          ? color.withValues(alpha: 0.7)
+                          : Colors.white.withValues(alpha: 0.1),
+                      width: isSelected ? 2 : 1,
                     ),
-                    // Checkmark
-                    if (isSelected)
-                      Icon(
-                        Icons.check_circle,
-                        color: color.withValues(alpha: 0.9),
-                        size: 18,
+                  ),
+                  child: Row(
+                    children: [
+                      // Icon
+                      Text(cat.icon, style: const TextStyle(fontSize: 20)),
+                      const SizedBox(width: 12),
+                      // Short name
+                      Expanded(
+                        child: Text(
+                          shortName,
+                          style: GoogleFonts.inter(
+                            color: isSelected
+                                ? Colors.white
+                                : Colors.white.withValues(alpha: 0.6),
+                            fontSize: 13,
+                            fontWeight:
+                                isSelected ? FontWeight.w700 : FontWeight.w500,
+                          ),
+                        ),
                       ),
-                  ],
+                      // Checkmark
+                      if (isSelected)
+                        Icon(
+                          Icons.check_circle,
+                          color: color.withValues(alpha: 0.9),
+                          size: 18,
+                        ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -463,203 +427,57 @@ class AppDrawer extends StatelessWidget {
 
   Widget _buildTierChip(String label, String tier, BuildContext context) {
     final selected = selectedTiers.contains(tier);
-    return GestureDetector(
-      onTap: () {
-        HapticFeedback.selectionClick();
-        final newTiers = List<String>.from(selectedTiers);
-        if (newTiers.contains(tier)) {
-          // Don't allow deselecting the last tier
-          if (newTiers.length <= 1) {
-            AppSnackBar.show(context, 'At least one tier must stay selected');
-            return;
-          }
-          newTiers.remove(tier);
-        } else {
-          newTiers.add(tier);
-        }
-        onTierChanged(newTiers);
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        decoration: BoxDecoration(
-          color: selected
-              ? const Color(0xFF4ECDC4).withValues(alpha: 0.2)
-              : Colors.white.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: selected
-                ? const Color(0xFF4ECDC4)
-                : Colors.white.withValues(alpha: 0.15),
-          ),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                color: selected ? Colors.white : Colors.white38,
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const Spacer(),
-            if (selected)
-              const Icon(
-                Icons.check_circle,
-                color: Color(0xFF4ECDC4),
-                size: 16,
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ── Settings Widgets ──
-
-  Widget _buildDarkModeToggle() {
-    return _buildSettingToggle(
-      icon: '🌙',
-      label: 'Dark Mode',
-      value: isDarkMode,
-      onChanged: onDarkModeChanged,
-    );
-  }
-
-  Widget _buildSoundEffectsToggle() {
-    return _buildSettingToggle(
-      icon: '🔊',
-      label: 'Sound Effects',
-      subtitle: 'Spin sounds, tick, chime',
-      value: soundEffects,
-      onChanged: onSoundEffectsChanged,
-    );
-  }
-
-  Widget _buildHapticFeedbackToggle() {
-    return _buildSettingToggle(
-      icon: '📳',
-      label: 'Haptic Feedback',
-      subtitle: 'Vibration intensity',
-      value: hapticFeedback,
-      onChanged: onHapticFeedbackChanged,
-    );
-  }
-
-  Widget _buildSettingToggle({
-    required String icon,
-    required String label,
-    String? subtitle,
-    required bool value,
-    required ValueChanged<bool> onChanged,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.1),
-          ),
-        ),
-        child: Row(
-          children: [
-            Text(icon, style: const TextStyle(fontSize: 20)),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: GoogleFonts.inter(
-                      color: Colors.white70,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  if (subtitle != null) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      style: GoogleFonts.inter(
-                        color: Colors.white38,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            Switch(
-              value: value,
-              onChanged: onChanged,
-              activeThumbColor: const Color(0xFF4ECDC4),
-              activeTrackColor: const Color(0xFF4ECDC4).withValues(alpha: 0.3),
-              inactiveThumbColor: Colors.white54,
-              inactiveTrackColor: Colors.white.withValues(alpha: 0.15),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHistoryItem(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+    return Semantics(
+      label: 'Select $label tier',
+      toggled: selected,
       child: GestureDetector(
         onTap: () {
           HapticFeedback.selectionClick();
-          AppSnackBar.show(context, 'Coming soon!');
+          final newTiers = List<String>.from(selectedTiers);
+          if (newTiers.contains(tier)) {
+            // Don't allow deselecting the last tier
+            if (newTiers.length <= 1) {
+              AppSnackBar.show(context, 'At least one tier must stay selected');
+              return;
+            }
+            newTiers.remove(tier);
+          } else {
+            newTiers.add(tier);
+          }
+          onTierChanged(newTiers);
         },
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.05),
+            color: selected
+                ? AppColors.accent.withValues(alpha: 0.2)
+                : Colors.white.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.1),
+              color: selected
+                  ? AppColors.accent
+                  : Colors.white.withValues(alpha: 0.15),
             ),
           ),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Text('📋', style: TextStyle(fontSize: 20)),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'History',
-                      style: GoogleFonts.inter(
-                        color: Colors.white70,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'Past completed tasks',
-                      style: GoogleFonts.inter(
-                        color: Colors.white38,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ],
+              Text(
+                label,
+                style: TextStyle(
+                  color: selected ? Colors.white : Colors.white38,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-              Icon(
-                Icons.chevron_right,
-                color: Colors.white.withValues(alpha: 0.3),
-                size: 20,
-              ),
+              const Spacer(),
+              if (selected)
+                Icon(
+                  Icons.check_circle,
+                  color: AppColors.accent,
+                  size: 16,
+                ),
             ],
           ),
         ),
@@ -700,10 +518,10 @@ class AppDrawer extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF4ECDC4).withValues(alpha: 0.15),
+                  color: AppColors.accent.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: const Color(0xFF4ECDC4).withValues(alpha: 0.3),
+                    color: AppColors.accent.withValues(alpha: 0.3),
                   ),
                 ),
                 alignment: Alignment.center,
@@ -766,13 +584,13 @@ class AppDrawer extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF4ECDC4).withValues(alpha: 0.15),
+                  color: AppColors.accent.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   'Avatar',
                   style: GoogleFonts.inter(
-                    color: const Color(0xFF4ECDC4),
+                    color: AppColors.accent,
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                   ),

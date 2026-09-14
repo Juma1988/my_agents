@@ -1,4 +1,4 @@
-name: handicap
+name: risk_roulette
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -38,6 +38,7 @@ dependencies:
   flutter_animate: ^4.3.0
   hive: ^2.2.3
   hive_flutter: ^1.1.0
+  audioplayers: ^6.1.0
 
 dev_dependencies:
   flutter_test:

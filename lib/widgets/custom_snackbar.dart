@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../theme/app_colors.dart';
 
 /// Custom styled snackbar for the app.
 /// Use instead of default SnackBar everywhere.
@@ -30,13 +31,13 @@ class AppSnackBar {
             ),
           ],
         ),
-        backgroundColor: const Color(0xFF4ECDC4),
+        backgroundColor: AppColors.accent,
         duration: const Duration(seconds: 2),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        margin: const EdgeInsets.only(bottom: 80),
       ),
     );
   }

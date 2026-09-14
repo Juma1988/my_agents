@@ -9,9 +9,11 @@ import '../data/task_loader.dart';
 import '../data/category_colors.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/category_card_wheel.dart';
+import '../theme/app_colors.dart';
 
 import '../widgets/spin_button.dart';
 import '../widgets/wheel_pointer.dart';
+import 'timer_screen.dart';
 
 class SpinScreen extends StatefulWidget {
   const SpinScreen({super.key});
@@ -25,11 +27,11 @@ class _SpinScreenState extends State<SpinScreen> {
   final GlobalKey<CategoryCardWheelState> _wheelKey = GlobalKey();
   bool _isSpinning = false;
   bool _isLoading = true;
-  bool _isDarkMode = true;
+  bool _hasError = false;
+  String? _errorMessage;
 
   // Settings
-  bool _soundEffects = true;
-  bool _hapticFeedback = true;
+  final bool _hapticFeedback = true;
 
   // 2-Player state
   int _currentPlayer = 1;
@@ -53,7 +55,18 @@ class _SpinScreenState extends State<SpinScreen> {
   }
 
   Future<void> _loadCategories() async {
-    final categories = await TaskLoader.loadCategories();
+    final result = await TaskLoader.loadCategoriesWithRetry();
+
+    if (!result.isSuccess) {
+      setState(() {
+        _hasError = true;
+        _errorMessage = result.errorMessage;
+        _isLoading = false;
+      });
+      return;
+    }
+
+    final categories = result.categories;
 
     // Load saved selected category IDs from Hive
     final savedIds = _settingsBox.get('selectedCategoryIds', defaultValue: null);
@@ -86,24 +99,6 @@ class _SpinScreenState extends State<SpinScreen> {
       _selectedTiers = ['soft'];
     }
 
-    // Load dark mode preference
-    final savedDarkMode = _settingsBox.get('isDarkMode', defaultValue: true);
-    if (savedDarkMode is bool) {
-      _isDarkMode = savedDarkMode;
-    }
-
-    // Load sound effects preference
-    final savedSoundEffects = _settingsBox.get('soundEffects', defaultValue: true);
-    if (savedSoundEffects is bool) {
-      _soundEffects = savedSoundEffects;
-    }
-
-    // Load haptic feedback preference
-    final savedHapticFeedback = _settingsBox.get('hapticFeedback', defaultValue: true);
-    if (savedHapticFeedback is bool) {
-      _hapticFeedback = savedHapticFeedback;
-    }
-
     // Load player data from Hive
     _currentPlayer = _settingsBox.get('current_player', defaultValue: 1) as int;
     _scores = {
@@ -129,9 +124,6 @@ class _SpinScreenState extends State<SpinScreen> {
   void _saveSettings() {
     _settingsBox.put('selectedCategoryIds', _selectedCategoryIds);
     _settingsBox.put('selectedTiers', _selectedTiers);
-    _settingsBox.put('isDarkMode', _isDarkMode);
-    _settingsBox.put('soundEffects', _soundEffects);
-    _settingsBox.put('hapticFeedback', _hapticFeedback);
     _savePlayerData();
   }
 
@@ -155,27 +147,6 @@ class _SpinScreenState extends State<SpinScreen> {
   void _onTierChanged(List<String> tiers) {
     setState(() {
       _selectedTiers = tiers;
-    });
-    _saveSettings();
-  }
-
-  void _onDarkModeChanged(bool value) {
-    setState(() {
-      _isDarkMode = value;
-    });
-    _saveSettings();
-  }
-
-  void _onSoundEffectsChanged(bool value) {
-    setState(() {
-      _soundEffects = value;
-    });
-    _saveSettings();
-  }
-
-  void _onHapticFeedbackChanged(bool value) {
-    setState(() {
-      _hapticFeedback = value;
     });
     _saveSettings();
   }
@@ -264,46 +235,113 @@ class _SpinScreenState extends State<SpinScreen> {
           if (_hapticFeedback) {
             HapticFeedback.mediumImpact();
           }
-          // Add points to current player
-          setState(() {
-            _scores[_currentPlayer] = (_scores[_currentPlayer] ?? 0) + task.points;
-          });
-          _savePlayerData();
-          // Toggle to other player
-          _togglePlayer();
+          // Close the bottom sheet first
           Navigator.of(context).pop();
+
+          if (task.hasTimer) {
+            // Navigate to the full-screen timer for timed tasks
+            Navigator.of(context)
+                .push<TimerResult>(
+              MaterialPageRoute(
+                builder: (_) => TimerScreen(
+                  taskText: task.text,
+                  timerSeconds: task.timerSeconds!,
+                  points: task.points,
+                  categoryName: category.name,
+                  categoryIcon: category.icon,
+                ),
+              ),
+            )
+                .then((result) {
+              if (!mounted) return;
+              if (result != null && result.completed) {
+                // User completed the task — award points and toggle
+                setState(() {
+                  _scores[_currentPlayer] =
+                      (_scores[_currentPlayer] ?? 0) + task.points;
+                });
+                _savePlayerData();
+                _showFloatingScore(task.points, isAccept: true);
+                _togglePlayer();
+              }
+              // Cancel: no points, no toggle
+            });
+          } else {
+            // Non-timed task: award points immediately
+            setState(() {
+              _scores[_currentPlayer] =
+                  (_scores[_currentPlayer] ?? 0) + task.points;
+            });
+            _savePlayerData();
+            _showFloatingScore(task.points, isAccept: true);
+            _togglePlayer();
+          }
         },
         onSkip: () {
           if (_hapticFeedback) {
             HapticFeedback.lightImpact();
           }
-          // Toggle to other player
-          _togglePlayer();
+          // Penalty = task.points, same player rolls again (no toggle)
+          setState(() {
+            _scores[_currentPlayer] = (_scores[_currentPlayer] ?? 0) - task.points;
+          });
+          _savePlayerData();
+          // Show skip animation
+          _showFloatingScore(task.points, isAccept: false);
           Navigator.of(context).pop();
         },
       ),
     );
   }
 
+  /// Show floating score animation (+X or -X)
+  void _showFloatingScore(int points, {required bool isAccept}) {
+    final overlay = Overlay.of(context);
+    late OverlayEntry entry;
+    entry = OverlayEntry(
+      builder: (context) => Positioned(
+        top: MediaQuery.of(context).size.height * 0.4,
+        left: 0,
+        right: 0,
+        child: Center(
+          child: TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0, end: -60),
+            duration: const Duration(milliseconds: 800),
+            builder: (context, value, _) {
+              return Opacity(
+                opacity: (1.0 + value / 60).clamp(0.0, 1.0),
+                child: Transform.translate(
+                  offset: Offset(0, value),
+                  child: Text(
+                    '${isAccept ? "+" : "-"}$points',
+                    style: TextStyle(
+                      color: isAccept ? AppColors.accent : AppColors.timerWarning,
+                      fontSize: 32,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+    overlay.insert(entry);
+    Future.delayed(const Duration(milliseconds: 900), () => entry.remove());
+  }
+
   @override
   Widget build(BuildContext context) {
-    final bgColor = _isDarkMode ? const Color(0xFF1A1A2E) : const Color(0xFFF5F5F5);
-
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: bgColor,
+      backgroundColor: AppColors.background,
       endDrawer: AppDrawer(
         categories: _categories,
         selectedCategoryIds: _selectedCategoryIds,
         onSelectionChanged: _onCategorySelectionChanged,
         selectedTiers: _selectedTiers,
         onTierChanged: _onTierChanged,
-        isDarkMode: _isDarkMode,
-        onDarkModeChanged: _onDarkModeChanged,
-        soundEffects: _soundEffects,
-        onSoundEffectsChanged: _onSoundEffectsChanged,
-        hapticFeedback: _hapticFeedback,
-        onHapticFeedbackChanged: _onHapticFeedbackChanged,
         player1Nickname: _nicknames[1]!,
         player2Nickname: _nicknames[2]!,
         player1Avatar: _avatars[1]!,
@@ -315,22 +353,76 @@ class _SpinScreenState extends State<SpinScreen> {
       ),
       body: SafeArea(
         child: _isLoading
-            ? Center(
+            ? const Center(
                 child: CircularProgressIndicator(
-                  color: _isDarkMode
-                      ? const Color(0xFF4ECDC4)
-                      : const Color(0xFF2AB7AD),
+                  color: AppColors.accent,
                 ),
               )
-            : _buildMainContent(),
+            : _hasError
+                ? _buildErrorState()
+                : _buildMainContent(),
+      ),
+    );
+  }
+
+  Widget _buildErrorState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.error_outline,
+              color: Colors.white24,
+              size: 48,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              _errorMessage ?? 'Failed to load tasks',
+              style: GoogleFonts.inter(
+                color: Colors.white54,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _isLoading = true;
+                  _hasError = false;
+                  _errorMessage = null;
+                });
+                _loadCategories();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.accent,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+              ),
+              child: Text(
+                'Retry',
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildMainContent() {
-    final textColor = _isDarkMode
-        ? Colors.white.withValues(alpha: 0.92)
-        : const Color(0xFF1A1A2E);
+    final textColor = Colors.white.withValues(alpha: 0.92);
 
     return Column(
       children: [
@@ -394,21 +486,25 @@ class _SpinScreenState extends State<SpinScreen> {
           children: [
             // Player 1
             Expanded(
-              child: GestureDetector(
-                onTap: () {
-                  if (_currentPlayer != 1) {
-                    if (_hapticFeedback) {
-                      HapticFeedback.selectionClick();
+              child: Semantics(
+                label: 'Player 1, ${_nicknames[1]}, ${_scores[1]} points',
+                button: true,
+                child: GestureDetector(
+                  onTap: () {
+                    if (_currentPlayer != 1) {
+                      if (_hapticFeedback) {
+                        HapticFeedback.selectionClick();
+                      }
+                      setState(() {
+                        _currentPlayer = 1;
+                      });
+                      _savePlayerData();
                     }
-                    setState(() {
-                      _currentPlayer = 1;
-                    });
-                    _savePlayerData();
-                  }
-                },
-                child: _buildPlayerCard(
-                  player: 1,
-                  isCurrent: _currentPlayer == 1,
+                  },
+                  child: _buildPlayerCard(
+                    player: 1,
+                    isCurrent: _currentPlayer == 1,
+                  ),
                 ),
               ),
             ),
@@ -429,21 +525,25 @@ class _SpinScreenState extends State<SpinScreen> {
 
             // Player 2
             Expanded(
-              child: GestureDetector(
-                onTap: () {
-                  if (_currentPlayer != 2) {
-                    if (_hapticFeedback) {
-                      HapticFeedback.selectionClick();
+              child: Semantics(
+                label: 'Player 2, ${_nicknames[2]}, ${_scores[2]} points',
+                button: true,
+                child: GestureDetector(
+                  onTap: () {
+                    if (_currentPlayer != 2) {
+                      if (_hapticFeedback) {
+                        HapticFeedback.selectionClick();
+                      }
+                      setState(() {
+                        _currentPlayer = 2;
+                      });
+                      _savePlayerData();
                     }
-                    setState(() {
-                      _currentPlayer = 2;
-                    });
-                    _savePlayerData();
-                  }
-                },
-                child: _buildPlayerCard(
-                  player: 2,
-                  isCurrent: _currentPlayer == 2,
+                  },
+                  child: _buildPlayerCard(
+                    player: 2,
+                    isCurrent: _currentPlayer == 2,
+                  ),
                 ),
               ),
             ),
@@ -451,18 +551,22 @@ class _SpinScreenState extends State<SpinScreen> {
             const SizedBox(width: 4),
 
             // Menu button (right side)
-            IconButton(
-              icon: Icon(
-                Icons.menu,
-                color: textColor,
-                size: 24,
+            Semantics(
+              label: 'Open menu',
+              button: true,
+              child: IconButton(
+                icon: Icon(
+                  Icons.menu,
+                  color: textColor,
+                  size: 24,
+                ),
+                onPressed: () {
+                  _scaffoldKey.currentState?.openEndDrawer();
+                },
+                splashRadius: 20,
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                constraints: const BoxConstraints(),
               ),
-              onPressed: () {
-                _scaffoldKey.currentState?.openEndDrawer();
-              },
-              splashRadius: 20,
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              constraints: const BoxConstraints(),
             ),
           ],
         ),
@@ -480,12 +584,12 @@ class _SpinScreenState extends State<SpinScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
         color: isCurrent
-            ? const Color(0xFF4ECDC4).withValues(alpha: 0.15)
+            ? AppColors.accent.withValues(alpha: 0.15)
             : Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: isCurrent
-              ? const Color(0xFF4ECDC4).withValues(alpha: 0.6)
+              ? AppColors.accent.withValues(alpha: 0.6)
               : Colors.white.withValues(alpha: 0.1),
           width: isCurrent ? 2 : 1,
         ),
@@ -517,7 +621,7 @@ class _SpinScreenState extends State<SpinScreen> {
             'Score: $score',
             style: GoogleFonts.inter(
               color: isCurrent
-                  ? const Color(0xFF4ECDC4)
+                  ? AppColors.accent
                   : Colors.white.withValues(alpha: 0.4),
               fontSize: 12,
               fontWeight: FontWeight.w600,
@@ -783,7 +887,7 @@ class _TaskDetailSheetState extends State<_TaskDetailSheet> {
                 widget.onAccept();
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF4ECDC4),
+                backgroundColor: AppColors.accent,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(28),
@@ -819,7 +923,7 @@ class _TaskDetailSheetState extends State<_TaskDetailSheet> {
                 ),
               ),
               child: Text(
-                'Skip (-1 pt)',
+                'Skip (-${widget.task.points} pt${widget.task.points == 1 ? '' : 's'})',
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
