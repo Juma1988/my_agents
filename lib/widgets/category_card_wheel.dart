@@ -34,7 +34,6 @@ class CategoryCardWheel extends StatefulWidget {
     required this.selectedTier,
     this.initialIndex = 0,
     this.onCenterChanged,
-    this.onTaskTap,
   });
 
   final List<ChallengeCategory> categories;
@@ -42,7 +41,6 @@ class CategoryCardWheel extends StatefulWidget {
   final String selectedTier;
   final int initialIndex;
   final ValueChanged<int>? onCenterChanged;
-  final ValueChanged<TaskCardItem>? onTaskTap;
 
   @override
   State<CategoryCardWheel> createState() => CategoryCardWheelState();
@@ -85,6 +83,7 @@ class CategoryCardWheelState extends State<CategoryCardWheel> {
         }
       }
     }
+    pool.shuffle(math.Random());
     return pool;
   }
 
@@ -209,9 +208,6 @@ class CategoryCardWheelState extends State<CategoryCardWheel> {
                         isCenter: index == selected,
                         pulse: isPulseTarget,
                         pulseKey: isPulseTarget ? '$pulseTick' : null,
-                        onTap: index == selected
-                            ? () => widget.onTaskTap?.call(item)
-                            : null,
                       );
                     },
                   );
@@ -287,14 +283,12 @@ class TaskCard extends StatelessWidget {
     this.isCenter = false,
     this.pulse = false,
     this.pulseKey,
-    this.onTap,
   });
 
   final TaskCardItem item;
   final bool isCenter;
   final bool pulse;
   final String? pulseKey;
-  final VoidCallback? onTap;
 
   static const double cardHeight = 130.0;
 
@@ -378,6 +372,45 @@ class TaskCard extends StatelessWidget {
               ),
             ),
 
+            // Category section (~1/6 width)
+            SizedBox(
+              width: 52,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      item.category.icon,
+                      style: const TextStyle(fontSize: 24),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      item.category.name.toUpperCase(),
+                      style: GoogleFonts.inter(
+                        color: color.withValues(alpha: 0.7),
+                        fontSize: 8,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.2,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Vertical divider
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Container(
+                width: 1,
+                color: color.withValues(alpha: 0.2),
+              ),
+            ),
+
             // Main content
             Expanded(
               child: Padding(
@@ -385,59 +418,11 @@ class TaskCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Top row: icon + category name (left) + points badge (right)
-                    Row(
-                      children: [
-                        Text(
-                          item.category.icon,
-                          style: const TextStyle(fontSize: 18),
-                        ),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            item.category.name.toUpperCase(),
-                            style: GoogleFonts.inter(
-                              color: color.withValues(alpha: 0.8),
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 1.5,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        // Points badge
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: color.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: color.withValues(alpha: 0.4),
-                              width: 0.5,
-                            ),
-                          ),
-                          child: Text(
-                            '+${item.task.points}',
-                            style: GoogleFonts.inter(
-                              color: color,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    // Task text (3 lines max)
+                    // Task text (2 lines max)
                     Expanded(
                       child: Text(
                         item.task.text,
-                        maxLines: 3,
+                        maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.inter(
                           color: Colors.white.withValues(alpha: 0.92),
@@ -448,7 +433,7 @@ class TaskCard extends StatelessWidget {
                       ),
                     ),
 
-                    // Bottom row: tier pill (left) + timer (right)
+                    // Bottom row: tier pill (left) + points badge + timer (right)
                     Row(
                       children: [
                         // Tier pill
@@ -531,15 +516,7 @@ class TaskCard extends StatelessWidget {
           clipBehavior: Clip.antiAlias,
           child: Ink(
             decoration: fillDecoration,
-            child: onTap != null
-                ? InkWell(
-                    customBorder: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    onTap: onTap,
-                    child: content,
-                  )
-                : content,
+            child: content,
           ),
         ),
       ),

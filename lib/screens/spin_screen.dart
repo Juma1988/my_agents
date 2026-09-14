@@ -198,9 +198,6 @@ class _SpinScreenState extends State<SpinScreen> {
                 onCenterChanged: (index) {
                   // Task changed in center
                 },
-                onTaskTap: (item) {
-                  _showTaskBottomSheet(item.category, item.task);
-                },
               ),
               // Pointer at bottom
               Positioned(
