@@ -9,7 +9,7 @@ import '../data/task_loader.dart';
 import '../data/category_colors.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/category_card_wheel.dart';
-import '../widgets/score_bar.dart';
+
 import '../widgets/spin_button.dart';
 import '../widgets/wheel_pointer.dart';
 
@@ -31,8 +31,6 @@ class _SpinScreenState extends State<SpinScreen> {
   List<ChallengeCategory> _categories = [];
   List<String> _selectedCategoryIds = [];
   List<String> _selectedTiers = ['soft']; // default tiers
-
-  int _score = 0;
 
   // Hive box reference
   late Box _settingsBox;
@@ -162,16 +160,10 @@ class _SpinScreenState extends State<SpinScreen> {
         task: task,
         onAccept: () {
           HapticFeedback.mediumImpact();
-          setState(() {
-            _score += task.points;
-          });
           Navigator.of(context).pop();
         },
         onSkip: () {
           HapticFeedback.lightImpact();
-          setState(() {
-            _score -= 1;
-          });
           Navigator.of(context).pop();
         },
       ),
@@ -209,75 +201,42 @@ class _SpinScreenState extends State<SpinScreen> {
   }
 
   Widget _buildMainContent() {
-    final textColor = _isDarkMode ? Colors.white.withValues(alpha: 0.92) : const Color(0xFF1A1A2E);
-
-    return Stack(
+    return Column(
       children: [
-        Column(
-          children: [
-            // Score bar
-            ScoreBar(score: _score),
-
-            const SizedBox(height: 8),
-
-            // Card stack with pointer
-            Expanded(
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  // Task wheel
-                  CategoryCardWheel(
-                    key: _wheelKey,
-                    categories: _categories,
-                    selectedCategoryIds: _selectedCategoryIds,
-                    selectedTiers: _selectedTiers,
-                    onCenterChanged: (index) {
-                      // Task changed in center
-                    },
-                  ),
-                  // Pointer at bottom
-                  Positioned(
-                    bottom: 20,
-                    child: Transform.rotate(
-                      angle: 0,
-                      child: const WheelPointer(),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Spin button
-            SpinButton(
-              isSpinning: _isSpinning,
-              onPressed: _handleSpin,
-            ),
-
-            const SizedBox(height: 20),
-          ],
-        ),
-
-        // Hamburger menu button (top-right)
-        Positioned(
-          top: 8,
-          right: 8,
-          child: SafeArea(
-            child: Material(
-              color: Colors.transparent,
-              child: IconButton(
-                icon: Icon(
-                  Icons.menu,
-                  color: textColor,
-                  size: 26,
-                ),
-                onPressed: () {
-                  _scaffoldKey.currentState?.openEndDrawer();
+        // Card stack with pointer
+        Expanded(
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              // Task wheel
+              CategoryCardWheel(
+                key: _wheelKey,
+                categories: _categories,
+                selectedCategoryIds: _selectedCategoryIds,
+                selectedTiers: _selectedTiers,
+                onCenterChanged: (index) {
+                  // Task changed in center
                 },
-                splashRadius: 24,
               ),
-            ),
+              // Pointer at bottom
+              Positioned(
+                bottom: 20,
+                child: Transform.rotate(
+                  angle: 0,
+                  child: const WheelPointer(),
+                ),
+              ),
+            ],
           ),
         ),
+
+        // Spin button
+        SpinButton(
+          isSpinning: _isSpinning,
+          onPressed: _handleSpin,
+        ),
+
+        const SizedBox(height: 20),
       ],
     );
   }
