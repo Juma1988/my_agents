@@ -332,80 +332,54 @@ class _SpinScreenState extends State<SpinScreen> {
         ? Colors.white.withValues(alpha: 0.92)
         : const Color(0xFF1A1A2E);
 
-    return Stack(
+    return Column(
       children: [
-        Column(
-          children: [
-            // Player toggle bar
-            _buildPlayerToggle(),
+        // Player toggle bar (includes menu button)
+        _buildPlayerToggle(textColor),
 
-            // Card stack with pointer
-            Expanded(
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  // Task wheel
-                  CategoryCardWheel(
-                    key: _wheelKey,
-                    categories: _categories,
-                    selectedCategoryIds: _selectedCategoryIds,
-                    selectedTiers: _selectedTiers,
-                    onCenterChanged: (index) {
-                      // Task changed in center
-                    },
-                  ),
-                  // Pointer at bottom
-                  Positioned(
-                    bottom: 20,
-                    child: Transform.rotate(
-                      angle: 0,
-                      child: const WheelPointer(),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Spin button
-            SpinButton(
-              isSpinning: _isSpinning,
-              onPressed: _handleSpin,
-            ),
-
-            const SizedBox(height: 20),
-          ],
-        ),
-
-        // Menu button (top-right)
-        Positioned(
-          top: 8,
-          right: 8,
-          child: SafeArea(
-            child: Material(
-              color: Colors.transparent,
-              child: IconButton(
-                icon: Icon(
-                  Icons.menu,
-                  color: textColor,
-                  size: 26,
-                ),
-                onPressed: () {
-                  _scaffoldKey.currentState?.openEndDrawer();
+        // Card stack with pointer
+        Expanded(
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              // Task wheel
+              CategoryCardWheel(
+                key: _wheelKey,
+                categories: _categories,
+                selectedCategoryIds: _selectedCategoryIds,
+                selectedTiers: _selectedTiers,
+                onCenterChanged: (index) {
+                  // Task changed in center
                 },
-                splashRadius: 24,
               ),
-            ),
+              // Pointer at bottom
+              Positioned(
+                bottom: 20,
+                child: Transform.rotate(
+                  angle: 0,
+                  child: const WheelPointer(),
+                ),
+              ),
+            ],
           ),
         ),
+
+        // Spin button
+        SpinButton(
+          isSpinning: _isSpinning,
+          onPressed: _handleSpin,
+        ),
+
+        const SizedBox(height: 20),
       ],
     );
   }
 
-  /// Player toggle bar at top of screen
-  Widget _buildPlayerToggle() {
+  /// Player toggle bar at top of screen (includes menu button)
+  Widget _buildPlayerToggle(Color textColor) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.black.withValues(alpha: 0.2),
         border: Border(
@@ -414,64 +388,84 @@ class _SpinScreenState extends State<SpinScreen> {
           ),
         ),
       ),
-      child: Row(
-        children: [
-          // Player 1
-          Expanded(
-            child: GestureDetector(
-              onTap: () {
-                if (_currentPlayer != 1) {
-                  if (_hapticFeedback) {
-                    HapticFeedback.selectionClick();
-                  }
-                  setState(() {
-                    _currentPlayer = 1;
-                  });
-                  _savePlayerData();
-                }
+      child: SafeArea(
+        bottom: false,
+        child: Row(
+          children: [
+            // Menu button
+            IconButton(
+              icon: Icon(
+                Icons.menu,
+                color: textColor,
+                size: 24,
+              ),
+              onPressed: () {
+                _scaffoldKey.currentState?.openEndDrawer();
               },
-              child: _buildPlayerCard(
-                player: 1,
-                isCurrent: _currentPlayer == 1,
-              ),
+              splashRadius: 20,
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              constraints: const BoxConstraints(),
             ),
-          ),
 
-          // VS separator
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Text(
-              'VS',
-              style: GoogleFonts.inter(
-                color: Colors.white.withValues(alpha: 0.3),
-                fontSize: 12,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 2,
-              ),
-            ),
-          ),
+            const SizedBox(width: 4),
 
-          // Player 2
-          Expanded(
-            child: GestureDetector(
-              onTap: () {
-                if (_currentPlayer != 2) {
-                  if (_hapticFeedback) {
-                    HapticFeedback.selectionClick();
+            // Player 1
+            Expanded(
+              child: GestureDetector(
+                onTap: () {
+                  if (_currentPlayer != 1) {
+                    if (_hapticFeedback) {
+                      HapticFeedback.selectionClick();
+                    }
+                    setState(() {
+                      _currentPlayer = 1;
+                    });
+                    _savePlayerData();
                   }
-                  setState(() {
-                    _currentPlayer = 2;
-                  });
-                  _savePlayerData();
-                }
-              },
-              child: _buildPlayerCard(
-                player: 2,
-                isCurrent: _currentPlayer == 2,
+                },
+                child: _buildPlayerCard(
+                  player: 1,
+                  isCurrent: _currentPlayer == 1,
+                ),
               ),
             ),
-          ),
-        ],
+
+            // VS separator
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Text(
+                'VS',
+                style: GoogleFonts.inter(
+                  color: Colors.white.withValues(alpha: 0.3),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 2,
+                ),
+              ),
+            ),
+
+            // Player 2
+            Expanded(
+              child: GestureDetector(
+                onTap: () {
+                  if (_currentPlayer != 2) {
+                    if (_hapticFeedback) {
+                      HapticFeedback.selectionClick();
+                    }
+                    setState(() {
+                      _currentPlayer = 2;
+                    });
+                    _savePlayerData();
+                  }
+                },
+                child: _buildPlayerCard(
+                  player: 2,
+                  isCurrent: _currentPlayer == 2,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
