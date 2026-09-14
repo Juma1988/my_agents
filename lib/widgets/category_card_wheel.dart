@@ -269,16 +269,16 @@ class _ScaledChild extends StatelessWidget {
 
 /// A single task card shown inside the wheel.
 ///
-/// Layout:
+/// Premium Row-based layout:
 /// ```
-/// ┌─────────────────────────────┐
-///                    🏠   +2    │  ← category icon + points
-///                               │
-///  Do the dishes while          │  ← task text (2 lines max)
-///  completely naked and...      │
-///                               │
-///  DOMESTIC · Soft              │  ← category name + tier
-/// └─────────────────────────────┘
+/// ┌─────────────────────────────────────┐
+/// ┃                        🏠    +2    │
+/// ┃  Do the dishes while               │
+/// ┃  completely naked and              │
+/// ┃  humming a dirty song.             │
+/// ┃                                    │
+/// ┃  DOMESTIC          ⏱ 3:00          │
+/// └─────────────────────────────────────┘
 /// ```
 class TaskCard extends StatelessWidget {
   const TaskCard({
@@ -296,7 +296,7 @@ class TaskCard extends StatelessWidget {
   final String? pulseKey;
   final VoidCallback? onTap;
 
-  static const double cardHeight = 120.0;
+  static const double cardHeight = 130.0;
 
   Color get _categoryColor => CategoryColors.get(item.category.id);
 
@@ -317,141 +317,204 @@ class TaskCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = _categoryColor;
 
+    // Background gradient
     final fillDecoration = BoxDecoration(
       borderRadius: BorderRadius.circular(16),
-      color: color.withValues(alpha: isCenter ? 0.18 : 0.12),
+      gradient: LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          const Color(0xFF1E1E2E).withValues(alpha: 0.95),
+          const Color(0xFF16162A).withValues(alpha: 0.98),
+        ],
+      ),
       border: Border.all(
-        color: color.withValues(alpha: isCenter ? 0.5 : 0.25),
+        color: isCenter
+            ? color.withValues(alpha: 0.6)
+            : Colors.white.withValues(alpha: 0.08),
         width: isCenter ? 1.5 : 1,
       ),
     );
 
+    // Shadow
     final shadowDecoration = BoxDecoration(
       borderRadius: BorderRadius.circular(16),
       boxShadow: [
         BoxShadow(
-          color: Colors.black.withValues(alpha: isCenter ? 0.4 : 0.15),
-          blurRadius: isCenter ? 20 : 10,
-          offset: const Offset(0, 6),
+          color: Colors.black.withValues(alpha: isCenter ? 0.5 : 0.2),
+          blurRadius: isCenter ? 24 : 12,
+          offset: const Offset(0, 8),
         ),
         if (isCenter)
           BoxShadow(
-            color: color.withValues(alpha: 0.25),
-            blurRadius: 16,
-            spreadRadius: 1,
+            color: color.withValues(alpha: 0.3),
+            blurRadius: 20,
+            spreadRadius: 2,
           ),
       ],
     );
 
     final content = Stack(
       children: [
-        // Main content area
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Top row: category icon (right-aligned) — leave space for it
-              const SizedBox(height: 4),
-
-              // Task text (2 lines max)
-              Expanded(
-                child: Text(
-                  item.task.text,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: GoogleFonts.inter(
-                    color: Colors.white.withValues(alpha: 0.95),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    height: 1.4,
-                  ),
-                ),
-              ),
-
-              // Bottom row: category name + tier label
-              Text(
-                '${item.category.name.toUpperCase()} · ${_tierLabel(item.tier)}',
-                style: GoogleFonts.inter(
-                  color: color.withValues(alpha: 0.7),
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 1.2,
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        // Category icon — top-right corner
-        Positioned(
-          top: 12,
-          right: 14,
-          child: Text(
-            item.category.icon,
-            style: const TextStyle(fontSize: 20),
-          ),
-        ),
-
-        // Points badge — bottom-right corner
-        Positioned(
-          bottom: 12,
-          right: 14,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.25),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: color.withValues(alpha: 0.4),
-                width: 0.5,
-              ),
-            ),
-            child: Text(
-              '+${item.task.points}',
-              style: GoogleFonts.inter(
-                color: color,
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ),
-
-        // Timer indicator — top-left corner (if task has timer)
-        if (item.task.hasTimer)
-          Positioned(
-            top: 12,
-            left: 14,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        // Main row layout
+        Row(
+          children: [
+            // Left accent bar
+            Container(
+              width: 5,
               decoration: BoxDecoration(
-                color: const Color(0xFFFF8C42).withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.timer_outlined,
-                    color: Color(0xFFFF8C42),
-                    size: 10,
-                  ),
-                  const SizedBox(width: 3),
-                  Text(
-                    _formatTimerShort(item.task.timerSeconds!),
-                    style: GoogleFonts.inter(
-                      color: const Color(0xFFFF8C42),
-                      fontSize: 9,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  bottomLeft: Radius.circular(16),
+                ),
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    color.withValues(alpha: 0.9),
+                    color.withValues(alpha: 0.5),
+                  ],
+                ),
               ),
             ),
-          ),
 
-        // Pulse ring
+            // Main content
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Top row: icon + category name (left) + points badge (right)
+                    Row(
+                      children: [
+                        Text(
+                          item.category.icon,
+                          style: const TextStyle(fontSize: 18),
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            item.category.name.toUpperCase(),
+                            style: GoogleFonts.inter(
+                              color: color.withValues(alpha: 0.8),
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1.5,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        // Points badge
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: color.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: color.withValues(alpha: 0.4),
+                              width: 0.5,
+                            ),
+                          ),
+                          child: Text(
+                            '+${item.task.points}',
+                            style: GoogleFonts.inter(
+                              color: color,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    // Task text (3 lines max)
+                    Expanded(
+                      child: Text(
+                        item.task.text,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.inter(
+                          color: Colors.white.withValues(alpha: 0.92),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          height: 1.45,
+                        ),
+                      ),
+                    ),
+
+                    // Bottom row: tier pill (left) + timer (right)
+                    Row(
+                      children: [
+                        // Tier pill
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: color.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            _tierLabel(item.tier).toUpperCase(),
+                            style: GoogleFonts.inter(
+                              color: color.withValues(alpha: 0.7),
+                              fontSize: 9,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.8,
+                            ),
+                          ),
+                        ),
+
+                        const Spacer(),
+
+                        // Timer pill (if applicable)
+                        if (item.task.hasTimer)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFF8C42).withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.timer_outlined,
+                                  color: Color(0xFFFF8C42),
+                                  size: 10,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  _formatTimerShort(item.task.timerSeconds!),
+                                  style: GoogleFonts.inter(
+                                    color: const Color(0xFFFF8C42),
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+
+        // Pulse ring overlay
         if (isCenter && pulse && pulseKey != null)
           _PulseRing(pulseKey: pulseKey!, color: color),
       ],

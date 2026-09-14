@@ -22,6 +22,10 @@
 - Verified: `flutter analyze lib/` (0 issues), Fixed SingleTickerProviderStateMixin error, app runs on emulator
 - Source: Adapted from `temp/home/widgets/story_wheel.dart` pattern
 
-## 2026-09-14 22:30 — Yuna · Logic — CategoryCardWheel shows actual task cards instead of category icons
+## 2026-09-14 22:30 ï¿½ Yuna ï¿½ Logic ï¿½ CategoryCardWheel shows actual task cards instead of category icons
 - Changed: lib/widgets/category_card_wheel.dart (rewrote to show TaskCard with task text, category icon, points badge, timer indicator), lib/screens/spin_screen.dart (simplified spin flow, replaced ResultCard overlay with bottom sheet, rollToRandom returns exact TaskCardItem)
 - Verified: flutter analyze passes 0 issues, flutter run launches successfully on emulator-5554
+
+## 2026-09-14 23:15 â€” Yuna Â· Logic â€” Redesign TaskCard with premium Row-based layout
+- Changed: `lib/widgets/category_card_wheel.dart` (replaced TaskCard with Row-based layout, left accent bar, dark gradient bg, tier/timer pills, 3-line text, 130px height)
+- Verified: `flutter analyze` âœ… (0 issues)
