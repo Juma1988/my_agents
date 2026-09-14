@@ -185,7 +185,7 @@ class _SpinScreenState extends State<SpinScreen> {
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: bgColor,
-      drawer: AppDrawer(
+      endDrawer: AppDrawer(
         categories: _categories,
         selectedCategoryIds: _selectedCategoryIds,
         onSelectionChanged: _onCategorySelectionChanged,
@@ -257,10 +257,10 @@ class _SpinScreenState extends State<SpinScreen> {
           ],
         ),
 
-        // Hamburger menu button (top-left)
+        // Hamburger menu button (top-right)
         Positioned(
           top: 8,
-          left: 8,
+          right: 8,
           child: SafeArea(
             child: Material(
               color: Colors.transparent,
@@ -271,7 +271,7 @@ class _SpinScreenState extends State<SpinScreen> {
                   size: 26,
                 ),
                 onPressed: () {
-                  _scaffoldKey.currentState?.openDrawer();
+                  _scaffoldKey.currentState?.openEndDrawer();
                 },
                 splashRadius: 24,
               ),
