@@ -31,14 +31,14 @@ class CategoryCardWheel extends StatefulWidget {
     super.key,
     required this.categories,
     required this.selectedCategoryIds,
-    required this.selectedTier,
+    required this.selectedTiers,
     this.initialIndex = 0,
     this.onCenterChanged,
   });
 
   final List<ChallengeCategory> categories;
   final List<String> selectedCategoryIds;
-  final String selectedTier;
+  final List<String> selectedTiers;
   final int initialIndex;
   final ValueChanged<int>? onCenterChanged;
 
@@ -56,30 +56,35 @@ class CategoryCardWheelState extends State<CategoryCardWheel> {
 
   static const int _multiplier = 10000;
 
-  /// Build the flat task pool from selected categories + selected tier.
+  /// Build the flat task pool from selected categories + selected tiers.
   List<TaskCardItem> get _taskPool {
     final pool = <TaskCardItem>[];
     for (final cat in widget.categories) {
       if (!widget.selectedCategoryIds.contains(cat.id)) continue;
-      final tasks = cat.tasksForTier(widget.selectedTier);
-      for (final task in tasks) {
-        pool.add(TaskCardItem(
-          category: cat,
-          task: task,
-          tier: widget.selectedTier,
-        ));
-      }
-    }
-    // Fallback: if selected tier yields nothing, use all enabled tiers
-    if (pool.isEmpty) {
-      for (final cat in widget.categories) {
-        if (!widget.selectedCategoryIds.contains(cat.id)) continue;
-        for (final task in cat.enabledTiers) {
+      for (final tier in widget.selectedTiers) {
+        final tasks = cat.tasksForTier(tier);
+        for (final task in tasks) {
           pool.add(TaskCardItem(
             category: cat,
             task: task,
-            tier: widget.selectedTier,
+            tier: tier,
           ));
+        }
+      }
+    }
+    // Fallback: if selected tiers yield nothing, use all enabled tiers
+    if (pool.isEmpty) {
+      for (final cat in widget.categories) {
+        if (!widget.selectedCategoryIds.contains(cat.id)) continue;
+        for (final task in cat.soft) {
+          pool.add(TaskCardItem(category: cat, task: task, tier: 'soft'));
+        }
+        for (final task in cat.kink) {
+          pool.add(TaskCardItem(category: cat, task: task, tier: 'kink'));
+        }
+        for (final task in cat.entertainment) {
+          pool.add(TaskCardItem(
+              category: cat, task: task, tier: 'entertainment'));
         }
       }
     }

@@ -300,6 +300,51 @@
         {"id": "wil_e14", "text": "You have 5 minutes to make me cum. If you fail, I take full control for the next 15 minutes.", "points": 8, "timerSeconds": 300},
         {"id": "wil_e15", "text": "Ultimate wildcard: I get to invent one extreme task right now and you have to do it.", "points": 8}
       ]
+    },
+    {
+      "id": "two_player",
+      "name": "2 Player",
+      "icon": "👫",
+      "soft": [
+        {"id": "tp_s01", "text": "Give each other a 2-minute massage. No hands below the waist... yet.", "points": 2},
+        {"id": "tp_s02", "text": "One person cleans, the other 'helps' by staying naked and handing supplies.", "points": 2},
+        {"id": "tp_s03", "text": "Wash each other's back in the shower. Take turns. No rushing.", "points": 2},
+        {"id": "tp_s04", "text": "Cook a meal together wearing only aprons. Bonus points if you sneak touches.", "points": 3},
+        {"id": "tp_s05", "text": "Fold laundry together. Every wrong fold means a kiss somewhere of the other's choice.", "points": 2},
+        {"id": "tp_s06", "text": "One person vacuumes while the other provides 'motivation' from behind.", "points": 2},
+        {"id": "tp_s07", "text": "Clean the bathroom together. Stand close. Very close.", "points": 2},
+        {"id": "tp_s08", "text": "Take turns giving each other a foot rub for 3 minutes each. Eye contact required.", "points": 2, "timerSeconds": 180},
+        {"id": "tp_s09", "text": "Dust the room together. Every shelf you pass, steal a kiss.", "points": 2},
+        {"id": "tp_s10", "text": "Make the bed together. You must stay tangled up the entire time.", "points": 2},
+        {"id": "tp_s11", "text": "Wipe down counters side by side. Hip bumps count as flirting.", "points": 1},
+        {"id": "tp_s12", "text": "Put away groceries as a team. Race — loser gives a 1-minute back rub.", "points": 2}
+      ],
+      "kink": [
+        {"id": "tp_k01", "text": "One person cleans while the other watches from a chair, directing and complimenting (or teasing).", "points": 4},
+        {"id": "tp_k02", "text": "Give each other a full body massage with oil. Go slow. Edge each other for 5 minutes minimum.", "points": 5, "timerSeconds": 300},
+        {"id": "tp_k03", "text": "Cook naked together. Every time you touch, you both have to pause for 10 seconds.", "points": 4},
+        {"id": "tp_k04", "text": "Clean the mirror together while facing it. Watch yourselves the entire time.", "points": 4},
+        {"id": "tp_k05", "text": "One person does dishes while the other uses their body to distract them. No finishing until done.", "points": 5},
+        {"id": "tp_k06", "text": "Fold laundry naked. Every time you make eye contact, the other person gets to spank you.", "points": 5},
+        {"id": "tp_k07", "text": "Mop the floor together on all fours. Crawl toward each other. First to kiss wins.", "points": 4},
+        {"id": "tp_k08", "text": "One person irons clothes while the other grinds against them from behind. 3 minutes.", "points": 5, "timerSeconds": 180},
+        {"id": "tp_k09", "text": "Take turns giving erotic massages. The receiver can't touch — only moan and direct.", "points": 5},
+        {"id": "tp_k10", "text": "Clean the bedroom together. You can only use your bodies as cleaning tools.", "points": 5},
+        {"id": "tp_k11", "text": "Wash each other's hair in the shower. Use your body to rinse, not a cup.", "points": 4},
+        {"id": "tp_k12", "text": "Make the bed while taking turns giving each other oral. Don't stop until the bed is made.", "points": 5}
+      ],
+      "entertainment": [
+        {"id": "tp_e01", "text": "One person is the 'naked butler' for 10 minutes. Serve drinks, clean up, wear only a smile.", "points": 6, "timerSeconds": 600},
+        {"id": "tp_e02", "text": "69 position while the timer runs. 5 minutes minimum. The loser of a coin flip picks the position.", "points": 8, "timerSeconds": 300},
+        {"id": "tp_e03", "text": "Take turns giving a striptease while the other cleans. If the dancer stops, the cleaner stops too.", "points": 7},
+        {"id": "tp_e04", "text": "One person is tied up (loosely). The other cleans the room while using the tied person as a 'furniture' tool.", "points": 8},
+        {"id": "tp_e05", "text": "Simultaneous oral for 5 minutes. You stop when they stop. Make each other finish.", "points": 8, "timerSeconds": 300},
+        {"id": "tp_e06", "text": "Clean the entire apartment as a 'naughty maid and butler' duo. Full outfits optional.", "points": 7, "timerSeconds": 600},
+        {"id": "tp_e07", "text": "One person washes the car (or window) while the other provides 'encouragement' from inside.", "points": 6},
+        {"id": "tp_e08", "text": "Give each other a full body worship session. Kiss, lick, and massage every inch for 5 minutes.", "points": 8, "timerSeconds": 300},
+        {"id": "tp_e09", "text": "Take turns riding each other while the rider must keep cleaning something. Multitask!", "points": 8},
+        {"id": "tp_e10", "text": "One person cleans the kitchen. The other can interrupt with any sexual act at any time. Can you finish?", "points": 7, "timerSeconds": 480}
+      ]
     }
   ]
 }

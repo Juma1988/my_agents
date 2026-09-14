@@ -7,8 +7,8 @@ import '../models/challenge_category.dart';
 import '../models/challenge_segment.dart';
 import '../data/task_loader.dart';
 import '../data/category_colors.dart';
+import '../widgets/app_drawer.dart';
 import '../widgets/category_card_wheel.dart';
-import '../widgets/category_chip_selector.dart';
 import '../widgets/score_bar.dart';
 import '../widgets/spin_button.dart';
 import '../widgets/wheel_pointer.dart';
@@ -21,14 +21,16 @@ class SpinScreen extends StatefulWidget {
 }
 
 class _SpinScreenState extends State<SpinScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey<CategoryCardWheelState> _wheelKey = GlobalKey();
   bool _isSpinning = false;
   bool _isLoading = true;
+  bool _isDarkMode = true;
 
   // State
   List<ChallengeCategory> _categories = [];
   List<String> _selectedCategoryIds = [];
-  String _selectedTier = 'soft'; // default tier
+  List<String> _selectedTiers = ['soft']; // default tiers
 
   int _score = 0;
 
@@ -59,11 +61,27 @@ class _SpinScreenState extends State<SpinScreen> {
       _selectedCategoryIds = [categories.first.id];
     }
 
-    // Load saved tier from Hive
-    final savedTier = _settingsBox.get('selectedTier', defaultValue: 'soft');
-    if (savedTier is String &&
-        ['soft', 'kink', 'entertainment'].contains(savedTier)) {
-      _selectedTier = savedTier;
+    // Load saved tiers from Hive
+    final savedTiers = _settingsBox.get('selectedTiers', defaultValue: null);
+    if (savedTiers != null && savedTiers is List) {
+      _selectedTiers = List<String>.from(savedTiers.cast<String>());
+    }
+    // Ensure at least 1 tier is selected
+    if (_selectedTiers.isEmpty) {
+      _selectedTiers = ['soft'];
+    }
+    // Validate all tiers exist
+    _selectedTiers = _selectedTiers
+        .where((t) => ['soft', 'kink', 'entertainment'].contains(t))
+        .toList();
+    if (_selectedTiers.isEmpty) {
+      _selectedTiers = ['soft'];
+    }
+
+    // Load dark mode preference
+    final savedDarkMode = _settingsBox.get('isDarkMode', defaultValue: true);
+    if (savedDarkMode is bool) {
+      _isDarkMode = savedDarkMode;
     }
 
     setState(() {
@@ -72,10 +90,11 @@ class _SpinScreenState extends State<SpinScreen> {
     });
   }
 
-  /// Save selected category IDs and tier to Hive
+  /// Save selected category IDs and tiers to Hive
   void _saveSettings() {
     _settingsBox.put('selectedCategoryIds', _selectedCategoryIds);
-    _settingsBox.put('selectedTier', _selectedTier);
+    _settingsBox.put('selectedTiers', _selectedTiers);
+    _settingsBox.put('isDarkMode', _isDarkMode);
   }
 
   void _onCategorySelectionChanged(List<String> newSelection) {
@@ -85,9 +104,16 @@ class _SpinScreenState extends State<SpinScreen> {
     _saveSettings();
   }
 
-  void _onTierChanged(String tier) {
+  void _onTierChanged(List<String> tiers) {
     setState(() {
-      _selectedTier = tier;
+      _selectedTiers = tiers;
+    });
+    _saveSettings();
+  }
+
+  void _onDarkModeChanged(bool value) {
+    setState(() {
+      _isDarkMode = value;
     });
     _saveSettings();
   }
@@ -154,12 +180,28 @@ class _SpinScreenState extends State<SpinScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bgColor = _isDarkMode ? const Color(0xFF1A1A2E) : const Color(0xFFF5F5F5);
+
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A2E),
+      key: _scaffoldKey,
+      backgroundColor: bgColor,
+      drawer: AppDrawer(
+        categories: _categories,
+        selectedCategoryIds: _selectedCategoryIds,
+        onSelectionChanged: _onCategorySelectionChanged,
+        selectedTiers: _selectedTiers,
+        onTierChanged: _onTierChanged,
+        isDarkMode: _isDarkMode,
+        onDarkModeChanged: _onDarkModeChanged,
+      ),
       body: SafeArea(
         child: _isLoading
-            ? const Center(
-                child: CircularProgressIndicator(color: Color(0xFF4ECDC4)),
+            ? Center(
+                child: CircularProgressIndicator(
+                  color: _isDarkMode
+                      ? const Color(0xFF4ECDC4)
+                      : const Color(0xFF2AB7AD),
+                ),
               )
             : _buildMainContent(),
       ),
@@ -167,60 +209,75 @@ class _SpinScreenState extends State<SpinScreen> {
   }
 
   Widget _buildMainContent() {
-    return Column(
+    final textColor = _isDarkMode ? Colors.white.withValues(alpha: 0.92) : const Color(0xFF1A1A2E);
+
+    return Stack(
       children: [
-        // Score bar
-        ScoreBar(score: _score),
+        Column(
+          children: [
+            // Score bar
+            ScoreBar(score: _score),
 
-        // Category chip selector (top bar)
-        CategoryChipSelector(
-          categories: _categories,
-          selectedCategoryIds: _selectedCategoryIds,
-          onSelectionChanged: _onCategorySelectionChanged,
-        ),
+            const SizedBox(height: 8),
 
-        // Tier selector
-        TierChipSelector(
-          selectedTier: _selectedTier,
-          onTierChanged: _onTierChanged,
-        ),
-
-        const SizedBox(height: 8),
-
-        // Card stack with pointer
-        Expanded(
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              // Task wheel
-              CategoryCardWheel(
-                key: _wheelKey,
-                categories: _categories,
-                selectedCategoryIds: _selectedCategoryIds,
-                selectedTier: _selectedTier,
-                onCenterChanged: (index) {
-                  // Task changed in center
-                },
+            // Card stack with pointer
+            Expanded(
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  // Task wheel
+                  CategoryCardWheel(
+                    key: _wheelKey,
+                    categories: _categories,
+                    selectedCategoryIds: _selectedCategoryIds,
+                    selectedTiers: _selectedTiers,
+                    onCenterChanged: (index) {
+                      // Task changed in center
+                    },
+                  ),
+                  // Pointer at bottom
+                  Positioned(
+                    bottom: 20,
+                    child: Transform.rotate(
+                      angle: 0,
+                      child: const WheelPointer(),
+                    ),
+                  ),
+                ],
               ),
-              // Pointer at bottom
-              Positioned(
-                bottom: 20,
-                child: Transform.rotate(
-                  angle: 0,
-                  child: const WheelPointer(),
+            ),
+
+            // Spin button
+            SpinButton(
+              isSpinning: _isSpinning,
+              onPressed: _handleSpin,
+            ),
+
+            const SizedBox(height: 20),
+          ],
+        ),
+
+        // Hamburger menu button (top-left)
+        Positioned(
+          top: 8,
+          left: 8,
+          child: SafeArea(
+            child: Material(
+              color: Colors.transparent,
+              child: IconButton(
+                icon: Icon(
+                  Icons.menu,
+                  color: textColor,
+                  size: 26,
                 ),
+                onPressed: () {
+                  _scaffoldKey.currentState?.openDrawer();
+                },
+                splashRadius: 24,
               ),
-            ],
+            ),
           ),
         ),
-
-        // Spin button
-        SpinButton(
-          isSpinning: _isSpinning,
-          onPressed: _handleSpin,
-        ),
-
-        const SizedBox(height: 20),
       ],
     );
   }

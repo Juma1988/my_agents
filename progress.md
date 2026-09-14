@@ -36,3 +36,11 @@
 ## 2026-09-14 23:45 — Yuna · Logic — TaskCard refinements: points badge, taller card, category tint, center bold, font size
 - Changed: lib/widgets/category_card_wheel.dart (cardHeight 140, points badge in bottom row, category section tinted bg, center w600, category name 8px)
 - Verified: flutter analyze — 0 issues
+
+## 2026-09-14 00:15 — Yuna · Logic — Move category/tier selectors to Drawer, add dark/light mode settings
+- Changed: Created `lib/widgets/app_drawer.dart` (drawer with categories grid, tier chips, dark mode toggle), modified `lib/screens/spin_screen.dart` (added drawer, removed inline selectors, added hamburger menu button, dark mode state + persistence via Hive)
+- Verified: `flutter analyze` — 0 issues, `flutter run` on emulator-5554 — app launches and runs without errors
+
+## 2026-09-14 14:30 — Yuna · Logic — Snackbar on last category deselect, multi-select tier, new 2 Player category
+- Changed: `lib/widgets/app_drawer.dart` (Snackbar on last category/tier deselect, multi-tier chips, 'two_player' shortName), `lib/screens/spin_screen.dart` (List<String> _selectedTiers, Hive persistence), `lib/widgets/category_card_wheel.dart` (selectedTiers, combined tier task pool), `lib/data/category_colors.dart` (two_player color), `task.json` (2 Player category with soft/kink/entertainment tasks)
+- Verified: `flutter analyze` — 0 issues, `flutter run` on emulator-5554 — app builds and launches successfully

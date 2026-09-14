@@ -11,6 +11,7 @@ class CategoryColors {
     'roleplay': Color(0xFFA855F7), // Vivid Purple
     'sensation': Color(0xFFFFE66D), // Electric Yellow
     'wildcard': Color(0xFF4ECDC4), // Teal
+    'two_player': Color(0xFFFF6B9D), // Deep Pink
   };
 
   static const Map<String, Color> darkColors = {
@@ -20,6 +21,7 @@ class CategoryColors {
     'roleplay': Color(0xFF7733BB),
     'sensation': Color(0xFFCCAA22),
     'wildcard': Color(0xFF229999),
+    'two_player': Color(0xFFCC5580),
   };
 
   static Color get(String categoryId) {

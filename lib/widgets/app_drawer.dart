@@ -1,0 +1,371 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../models/challenge_category.dart';
+import '../data/category_colors.dart';
+
+/// Drawer panel containing category selection, tier selection, and settings.
+class AppDrawer extends StatelessWidget {
+  final List<ChallengeCategory> categories;
+  final List<String> selectedCategoryIds;
+  final ValueChanged<List<String>> onSelectionChanged;
+  final List<String> selectedTiers;
+  final ValueChanged<List<String>> onTierChanged;
+  final bool isDarkMode;
+  final ValueChanged<bool> onDarkModeChanged;
+
+  const AppDrawer({
+    super.key,
+    required this.categories,
+    required this.selectedCategoryIds,
+    required this.onSelectionChanged,
+    required this.selectedTiers,
+    required this.onTierChanged,
+    required this.isDarkMode,
+    required this.onDarkModeChanged,
+  });
+
+  /// Short display names for each category
+  static const Map<String, String> shortNames = {
+    'domestic': 'Dom',
+    'dirty_truth': 'Tru',
+    'spicy_dare': 'Dare',
+    'roleplay': 'Rol',
+    'sensation': 'Sen',
+    'wildcard': 'Wil',
+    'two_player': '2Ply',
+  };
+
+  void _toggleCategory(String categoryId, BuildContext context) {
+    final newSelection = List<String>.from(selectedCategoryIds);
+
+    if (newSelection.contains(categoryId)) {
+      // Don't allow deselecting the last one
+      if (newSelection.length <= 1) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(
+              'At least one category must stay selected',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            backgroundColor: const Color(0xFF4ECDC4),
+            duration: const Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        return;
+      }
+      newSelection.remove(categoryId);
+    } else {
+      newSelection.add(categoryId);
+    }
+
+    onSelectionChanged(newSelection);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      backgroundColor: const Color(0xFF16162A),
+      child: SafeArea(
+        child: Column(
+          children: [
+            // ── Header ──
+            _buildHeader(),
+
+            const Divider(color: Colors.white12, height: 1),
+
+            // ── Scrollable content ──
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: [
+                  const SizedBox(height: 16),
+
+                  // Categories section
+                  _buildSectionLabel('CATEGORIES'),
+                  const SizedBox(height: 10),
+                  _buildCategoryGrid(context),
+
+                  const SizedBox(height: 20),
+                  const Divider(color: Colors.white12, height: 1),
+                  const SizedBox(height: 20),
+
+                  // Tier section
+                  _buildSectionLabel('TIER'),
+                  const SizedBox(height: 10),
+                  _buildTierRow(context),
+
+                  const SizedBox(height: 20),
+                  const Divider(color: Colors.white12, height: 1),
+                  const SizedBox(height: 20),
+
+                  // Settings section
+                  _buildSectionLabel('SETTINGS'),
+                  const SizedBox(height: 10),
+                  _buildDarkModeToggle(),
+
+                  const SizedBox(height: 24),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFF1A1A2E), Color(0xFF16162A)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Text('🎰', style: TextStyle(fontSize: 28)),
+              const SizedBox(width: 10),
+              Text(
+                'Handicap',
+                style: GoogleFonts.inter(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Challenge Roulette',
+            style: GoogleFonts.inter(
+              color: Colors.white38,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              letterSpacing: 1,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionLabel(String label) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Text(
+        label,
+        style: GoogleFonts.inter(
+          color: Colors.white54,
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 2,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCategoryGrid(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          childAspectRatio: 1.0,
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 8,
+        ),
+        itemCount: categories.length,
+        itemBuilder: (context, index) {
+          final cat = categories[index];
+          final isSelected = selectedCategoryIds.contains(cat.id);
+          final color = CategoryColors.get(cat.id);
+          final shortName = shortNames[cat.id] ?? cat.name.substring(0, 3);
+
+          return GestureDetector(
+            onTap: () {
+              HapticFeedback.selectionClick();
+              _toggleCategory(cat.id, context);
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeOutCubic,
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? color.withValues(alpha: 0.25)
+                    : Colors.white.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isSelected
+                      ? color.withValues(alpha: 0.7)
+                      : Colors.white.withValues(alpha: 0.1),
+                  width: isSelected ? 2 : 1,
+                ),
+                boxShadow: isSelected
+                    ? [
+                        BoxShadow(
+                          color: color.withValues(alpha: 0.2),
+                          blurRadius: 8,
+                          spreadRadius: 1,
+                        ),
+                      ]
+                    : [],
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(cat.icon, style: const TextStyle(fontSize: 22)),
+                  const SizedBox(height: 4),
+                  Text(
+                    shortName,
+                    style: GoogleFonts.inter(
+                      color: isSelected
+                          ? Colors.white
+                          : Colors.white.withValues(alpha: 0.5),
+                      fontSize: 11,
+                      fontWeight:
+                          isSelected ? FontWeight.w700 : FontWeight.w500,
+                    ),
+                  ),
+                  if (isSelected)
+                    Icon(
+                      Icons.check_circle,
+                      color: color.withValues(alpha: 0.9),
+                      size: 12,
+                    ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildTierRow(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
+        children: [
+          Expanded(child: _buildTierChip('Soft', 'soft', context)),
+          const SizedBox(width: 8),
+          Expanded(child: _buildTierChip('Kink', 'kink', context)),
+          const SizedBox(width: 8),
+          Expanded(child: _buildTierChip('Entertainment', 'entertainment', context)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTierChip(String label, String tier, BuildContext context) {
+    final selected = selectedTiers.contains(tier);
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.selectionClick();
+        final newTiers = List<String>.from(selectedTiers);
+        if (newTiers.contains(tier)) {
+          // Don't allow deselecting the last tier
+          if (newTiers.length <= 1) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text(
+                  'At least one tier must stay selected',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                backgroundColor: const Color(0xFF4ECDC4),
+                duration: const Duration(seconds: 2),
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+            return;
+          }
+          newTiers.remove(tier);
+        } else {
+          newTiers.add(tier);
+        }
+        onTierChanged(newTiers);
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: selected
+              ? const Color(0xFF4ECDC4).withValues(alpha: 0.2)
+              : Colors.white.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: selected
+                ? const Color(0xFF4ECDC4)
+                : Colors.white.withValues(alpha: 0.15),
+          ),
+        ),
+        child: Center(
+          child: Text(
+            label,
+            style: TextStyle(
+              color: selected ? Colors.white : Colors.white38,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDarkModeToggle() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.1),
+          ),
+        ),
+        child: Row(
+          children: [
+            const Text('🌙', style: TextStyle(fontSize: 20)),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Dark Mode',
+                style: GoogleFonts.inter(
+                  color: Colors.white70,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            Switch(
+              value: isDarkMode,
+              onChanged: onDarkModeChanged,
+              activeThumbColor: const Color(0xFF4ECDC4),
+              activeTrackColor: const Color(0xFF4ECDC4).withValues(alpha: 0.3),
+              inactiveThumbColor: Colors.white54,
+              inactiveTrackColor: Colors.white.withValues(alpha: 0.15),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
