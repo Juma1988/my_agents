@@ -372,9 +372,9 @@ class TaskCard extends StatelessWidget {
               ),
             ),
 
-            // Category section (~1/6 width)
+            // Category section (~1/4 width)
             SizedBox(
-              width: 52,
+              width: 76,
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 child: Column(
@@ -382,18 +382,18 @@ class TaskCard extends StatelessWidget {
                   children: [
                     Text(
                       item.category.icon,
-                      style: const TextStyle(fontSize: 24),
+                      style: const TextStyle(fontSize: 28),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       item.category.name.toUpperCase(),
                       style: GoogleFonts.inter(
                         color: color.withValues(alpha: 0.7),
-                        fontSize: 8,
+                        fontSize: 9,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 1.2,
                       ),
-                      maxLines: 1,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.center,
                     ),
@@ -418,12 +418,10 @@ class TaskCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Task text (2 lines max)
+                    // Task text (wraps naturally)
                     Expanded(
                       child: Text(
                         item.task.text,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.inter(
                           color: Colors.white.withValues(alpha: 0.92),
                           fontSize: 14,
