@@ -21,3 +21,7 @@
 - Changed: Created `lib/widgets/category_card_wheel.dart` (ListWheelScrollView.useDelegate, 3D perspective, infinite loop, lazy building), updated `lib/screens/spin_screen.dart` to use new wheel
 - Verified: `flutter analyze lib/` (0 issues), Fixed SingleTickerProviderStateMixin error, app runs on emulator
 - Source: Adapted from `temp/home/widgets/story_wheel.dart` pattern
+
+## 2026-09-14 22:30 — Yuna · Logic — CategoryCardWheel shows actual task cards instead of category icons
+- Changed: lib/widgets/category_card_wheel.dart (rewrote to show TaskCard with task text, category icon, points badge, timer indicator), lib/screens/spin_screen.dart (simplified spin flow, replaced ResultCard overlay with bottom sheet, rollToRandom returns exact TaskCardItem)
+- Verified: flutter analyze passes 0 issues, flutter run launches successfully on emulator-5554
