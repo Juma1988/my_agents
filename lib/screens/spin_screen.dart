@@ -116,8 +116,11 @@ class _SpinScreenState extends State<SpinScreen> {
         _isSpinning = false;
       });
 
-      // Show the task detail bottom sheet
-      _showTaskBottomSheet(taskItem.category, taskItem.task);
+      // Small delay so the final card settles before the sheet pops up
+      Future.delayed(const Duration(milliseconds: 400), () {
+        if (!mounted) return;
+        _showTaskBottomSheet(taskItem.category, taskItem.task);
+      });
     });
   }
 
