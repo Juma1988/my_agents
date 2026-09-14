@@ -17,7 +17,9 @@
         {"id": "dom_s09", "text": "Sort the laundry into piles using only your feet.", "points": 1},
         {"id": "dom_s10", "text": "Vacuum for 60 seconds while bent over and looking back at me.", "points": 2, "timerSeconds": 60},
         {"id": "dom_s11", "text": "Carry a glass of water across the room on your back like a table.", "points": 2},
-        {"id": "dom_s12", "text": "Wipe the floor with your body for 20 seconds.", "points": 2}
+        {"id": "dom_s12", "text": "Wipe the floor with your body for 20 seconds.", "points": 2},
+        {"id": "dom_s13", "text": "Clean the house wearing only a thong and heels.", "points": 3},
+        {"id": "dom_s14", "text": "Let your partner pick your outfit for the next 24 hours.", "points": 3}
       ],
       "kink": [
         {"id": "dom_k01", "text": "Clean the kitchen counter using only your tongue and body. No hands, no cloths.", "points": 4},
@@ -231,7 +233,9 @@
         {"id": "sen_k09", "text": "Use only your tongue on my most sensitive spot for 2 minutes. No hands.", "points": 5, "timerSeconds": 120},
         {"id": "sen_k10", "text": "Blindfold me. You can use any part of your body except hands to tease me for 3 minutes.", "points": 5, "timerSeconds": 180},
         {"id": "sen_k11", "text": "Edge me right to the brink 3 times in a row using only your mouth.", "points": 5},
-        {"id": "sen_k12", "text": "I pour a little cold water or ice on you, then warm it up with my mouth. Repeat.", "points": 4}
+        {"id": "sen_k12", "text": "I pour a little cold water or ice on you, then warm it up with my mouth. Repeat.", "points": 4},
+        {"id": "sen_k13", "text": "Massage your partner's feet for 5 minutes — eye contact only.", "points": 4, "timerSeconds": 300},
+        {"id": "sen_k14", "text": "Wear a butt plug for 1 hour during chores.", "points": 5, "timerSeconds": 3600}
       ],
       "entertainment": [
         {"id": "sen_e01", "text": "Full sensory deprivation: blindfold + optional headphones. I own all your sensations for 10 minutes.", "points": 8, "timerSeconds": 600},
@@ -267,7 +271,9 @@
         {"id": "wil_s09", "text": "Act out how you walk when you’re really turned on.", "points": 1},
         {"id": "wil_s10", "text": "Give me your best ‘fuck me’ eyes for 20 seconds.", "points": 1},
         {"id": "wil_s11", "text": "Describe what you want me to do to you using only song lyrics.", "points": 2},
-        {"id": "wil_s12", "text": "Let me choose a piece of your clothing to take off you right now.", "points": 2}
+        {"id": "wil_s12", "text": "Let me choose a piece of your clothing to take off you right now.", "points": 2},
+        {"id": "wil_s13", "text": "Write 'I belong to you' on your body in lipstick.", "points": 2},
+        {"id": "wil_s14", "text": "Dance seductively for 1 minute while partner watches.", "points": 3}
       ],
       "kink": [
         {"id": "wil_k01", "text": "Pick a random household object. Make me feel good using only that object (within reason).", "points": 5},
@@ -298,7 +304,9 @@
         {"id": "wil_e12", "text": "You stay in position (my choice) for 10 minutes while I use your body as I like.", "points": 7, "timerSeconds": 600},
         {"id": "wil_e13", "text": "I create a new rule for the rest of the night. You have to obey it or face a bigger punishment.", "points": 7},
         {"id": "wil_e14", "text": "You have 5 minutes to make me cum. If you fail, I take full control for the next 15 minutes.", "points": 8, "timerSeconds": 300},
-        {"id": "wil_e15", "text": "Ultimate wildcard: I get to invent one extreme task right now and you have to do it.", "points": 8}
+        {"id": "wil_e15", "text": "Ultimate wildcard: I get to invent one extreme task right now and you have to do it.", "points": 8},
+        {"id": "wil_e16", "text": "Write a dirty poem about your partner and read it aloud.", "points": 6},
+        {"id": "wil_e17", "text": "Send a voice note of your biggest fantasy — no editing allowed.", "points": 7}
       ]
     },
     {

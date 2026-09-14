@@ -27,6 +27,16 @@ class _SpinScreenState extends State<SpinScreen> {
   bool _isLoading = true;
   bool _isDarkMode = true;
 
+  // Settings
+  bool _soundEffects = true;
+  bool _hapticFeedback = true;
+
+  // 2-Player state
+  int _currentPlayer = 1;
+  Map<int, int> _scores = {1: 0, 2: 0};
+  Map<int, String> _nicknames = {1: 'Player 1', 2: 'Player 2'};
+  Map<int, String> _avatars = {1: '😈', 2: '👿'};
+
   // State
   List<ChallengeCategory> _categories = [];
   List<String> _selectedCategoryIds = [];
@@ -82,17 +92,57 @@ class _SpinScreenState extends State<SpinScreen> {
       _isDarkMode = savedDarkMode;
     }
 
+    // Load sound effects preference
+    final savedSoundEffects = _settingsBox.get('soundEffects', defaultValue: true);
+    if (savedSoundEffects is bool) {
+      _soundEffects = savedSoundEffects;
+    }
+
+    // Load haptic feedback preference
+    final savedHapticFeedback = _settingsBox.get('hapticFeedback', defaultValue: true);
+    if (savedHapticFeedback is bool) {
+      _hapticFeedback = savedHapticFeedback;
+    }
+
+    // Load player data from Hive
+    _currentPlayer = _settingsBox.get('current_player', defaultValue: 1) as int;
+    _scores = {
+      1: _settingsBox.get('player1_score', defaultValue: 0) as int,
+      2: _settingsBox.get('player2_score', defaultValue: 0) as int,
+    };
+    _nicknames = {
+      1: _settingsBox.get('player1_nickname', defaultValue: 'Player 1') as String,
+      2: _settingsBox.get('player2_nickname', defaultValue: 'Player 2') as String,
+    };
+    _avatars = {
+      1: _settingsBox.get('player1_avatar', defaultValue: '😈') as String,
+      2: _settingsBox.get('player2_avatar', defaultValue: '👿') as String,
+    };
+
     setState(() {
       _categories = categories;
       _isLoading = false;
     });
   }
 
-  /// Save selected category IDs and tiers to Hive
+  /// Save all settings to Hive
   void _saveSettings() {
     _settingsBox.put('selectedCategoryIds', _selectedCategoryIds);
     _settingsBox.put('selectedTiers', _selectedTiers);
     _settingsBox.put('isDarkMode', _isDarkMode);
+    _settingsBox.put('soundEffects', _soundEffects);
+    _settingsBox.put('hapticFeedback', _hapticFeedback);
+    _savePlayerData();
+  }
+
+  void _savePlayerData() {
+    _settingsBox.put('current_player', _currentPlayer);
+    _settingsBox.put('player1_score', _scores[1]);
+    _settingsBox.put('player2_score', _scores[2]);
+    _settingsBox.put('player1_nickname', _nicknames[1]);
+    _settingsBox.put('player2_nickname', _nicknames[2]);
+    _settingsBox.put('player1_avatar', _avatars[1]);
+    _settingsBox.put('player2_avatar', _avatars[2]);
   }
 
   void _onCategorySelectionChanged(List<String> newSelection) {
@@ -116,13 +166,65 @@ class _SpinScreenState extends State<SpinScreen> {
     _saveSettings();
   }
 
+  void _onSoundEffectsChanged(bool value) {
+    setState(() {
+      _soundEffects = value;
+    });
+    _saveSettings();
+  }
+
+  void _onHapticFeedbackChanged(bool value) {
+    setState(() {
+      _hapticFeedback = value;
+    });
+    _saveSettings();
+  }
+
+  void _onPlayer1NicknameChanged(String value) {
+    setState(() {
+      _nicknames[1] = value;
+    });
+    _savePlayerData();
+  }
+
+  void _onPlayer2NicknameChanged(String value) {
+    setState(() {
+      _nicknames[2] = value;
+    });
+    _savePlayerData();
+  }
+
+  void _onPlayer1AvatarChanged(String value) {
+    setState(() {
+      _avatars[1] = value;
+    });
+    _savePlayerData();
+  }
+
+  void _onPlayer2AvatarChanged(String value) {
+    setState(() {
+      _avatars[2] = value;
+    });
+    _savePlayerData();
+  }
+
+  /// Toggle to the other player
+  void _togglePlayer() {
+    setState(() {
+      _currentPlayer = _currentPlayer == 1 ? 2 : 1;
+    });
+    _savePlayerData();
+  }
+
   void _handleSpin() {
     final activeCategories = _categories
         .where((c) => _selectedCategoryIds.contains(c.id))
         .toList();
     if (activeCategories.isEmpty) return;
 
-    HapticFeedback.lightImpact();
+    if (_hapticFeedback) {
+      HapticFeedback.lightImpact();
+    }
     setState(() {
       _isSpinning = true;
     });
@@ -159,11 +261,24 @@ class _SpinScreenState extends State<SpinScreen> {
         category: category,
         task: task,
         onAccept: () {
-          HapticFeedback.mediumImpact();
+          if (_hapticFeedback) {
+            HapticFeedback.mediumImpact();
+          }
+          // Add points to current player
+          setState(() {
+            _scores[_currentPlayer] = (_scores[_currentPlayer] ?? 0) + task.points;
+          });
+          _savePlayerData();
+          // Toggle to other player
+          _togglePlayer();
           Navigator.of(context).pop();
         },
         onSkip: () {
-          HapticFeedback.lightImpact();
+          if (_hapticFeedback) {
+            HapticFeedback.lightImpact();
+          }
+          // Toggle to other player
+          _togglePlayer();
           Navigator.of(context).pop();
         },
       ),
@@ -185,6 +300,18 @@ class _SpinScreenState extends State<SpinScreen> {
         onTierChanged: _onTierChanged,
         isDarkMode: _isDarkMode,
         onDarkModeChanged: _onDarkModeChanged,
+        soundEffects: _soundEffects,
+        onSoundEffectsChanged: _onSoundEffectsChanged,
+        hapticFeedback: _hapticFeedback,
+        onHapticFeedbackChanged: _onHapticFeedbackChanged,
+        player1Nickname: _nicknames[1]!,
+        player2Nickname: _nicknames[2]!,
+        player1Avatar: _avatars[1]!,
+        player2Avatar: _avatars[2]!,
+        onPlayer1NicknameChanged: _onPlayer1NicknameChanged,
+        onPlayer2NicknameChanged: _onPlayer2NicknameChanged,
+        onPlayer1AvatarChanged: _onPlayer1AvatarChanged,
+        onPlayer2AvatarChanged: _onPlayer2AvatarChanged,
       ),
       body: SafeArea(
         child: _isLoading
@@ -201,12 +328,17 @@ class _SpinScreenState extends State<SpinScreen> {
   }
 
   Widget _buildMainContent() {
-    final textColor = _isDarkMode ? Colors.white.withValues(alpha: 0.92) : const Color(0xFF1A1A2E);
+    final textColor = _isDarkMode
+        ? Colors.white.withValues(alpha: 0.92)
+        : const Color(0xFF1A1A2E);
 
     return Stack(
       children: [
         Column(
           children: [
+            // Player toggle bar
+            _buildPlayerToggle(),
+
             // Card stack with pointer
             Expanded(
               child: Stack(
@@ -266,6 +398,139 @@ class _SpinScreenState extends State<SpinScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  /// Player toggle bar at top of screen
+  Widget _buildPlayerToggle() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.2),
+        border: Border(
+          bottom: BorderSide(
+            color: Colors.white.withValues(alpha: 0.1),
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          // Player 1
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                if (_currentPlayer != 1) {
+                  if (_hapticFeedback) {
+                    HapticFeedback.selectionClick();
+                  }
+                  setState(() {
+                    _currentPlayer = 1;
+                  });
+                  _savePlayerData();
+                }
+              },
+              child: _buildPlayerCard(
+                player: 1,
+                isCurrent: _currentPlayer == 1,
+              ),
+            ),
+          ),
+
+          // VS separator
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Text(
+              'VS',
+              style: GoogleFonts.inter(
+                color: Colors.white.withValues(alpha: 0.3),
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 2,
+              ),
+            ),
+          ),
+
+          // Player 2
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                if (_currentPlayer != 2) {
+                  if (_hapticFeedback) {
+                    HapticFeedback.selectionClick();
+                  }
+                  setState(() {
+                    _currentPlayer = 2;
+                  });
+                  _savePlayerData();
+                }
+              },
+              child: _buildPlayerCard(
+                player: 2,
+                isCurrent: _currentPlayer == 2,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPlayerCard({required int player, required bool isCurrent}) {
+    final avatar = _avatars[player] ?? (player == 1 ? '😈' : '👿');
+    final nickname = _nicknames[player] ?? 'Player $player';
+    final score = _scores[player] ?? 0;
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: isCurrent
+            ? const Color(0xFF4ECDC4).withValues(alpha: 0.15)
+            : Colors.white.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: isCurrent
+              ? const Color(0xFF4ECDC4).withValues(alpha: 0.6)
+              : Colors.white.withValues(alpha: 0.1),
+          width: isCurrent ? 2 : 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(avatar, style: const TextStyle(fontSize: 22)),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  nickname,
+                  style: GoogleFonts.inter(
+                    color: isCurrent
+                        ? Colors.white
+                        : Colors.white.withValues(alpha: 0.5),
+                    fontSize: 13,
+                    fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w500,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Score: $score',
+            style: GoogleFonts.inter(
+              color: isCurrent
+                  ? const Color(0xFF4ECDC4)
+                  : Colors.white.withValues(alpha: 0.4),
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

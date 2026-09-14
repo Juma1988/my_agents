@@ -48,3 +48,11 @@
 ## 2026-09-14 14:00 — Yuna · Logic — Custom snackbar widget + tier descriptions in drawer
 - Changed: lib/widgets/custom_snackbar.dart (created), lib/widgets/app_drawer.dart (import, tierDescriptions map, chip layout, snackbar replacements)
 - Verified: flutter analyze — No issues found; flutter run — built and launched on emulator-5554
+
+## 2026-09-14 15:30 — Yuna · Logic — Add new tasks, 2-player system, settings, and profiles
+- Changed: 	ask.json (8 new tasks: dom_s13/s14, wil_s13/s14, sen_k13/k14, wil_e16/e17), lib/widgets/app_drawer.dart (settings: sound effects toggle, haptic feedback toggle, history item; profiles section with avatar picker + nickname editor), lib/screens/spin_screen.dart (2-player state, player toggle bar, scores, Hive persistence)
+- Verified: lutter analyze ? (0 issues), lutter run on emulator-5554 ? (built and launched successfully)
+
+## 2026-09-14 15:45 — Yuna · Logic — Add new tasks, 2-player system, settings, and profiles
+- Changed: 	ask.json (8 new tasks), lib/widgets/app_drawer.dart (settings + profiles sections), lib/screens/spin_screen.dart (2-player state, toggle, scores, Hive persistence)
+- Verified: lutter analyze ? (0 issues), lutter run on emulator-5554 ? (built and launched successfully)
