@@ -290,7 +290,7 @@ class TaskCard extends StatelessWidget {
   final bool pulse;
   final String? pulseKey;
 
-  static const double cardHeight = 130.0;
+  static const double cardHeight = 140.0;
 
   Color get _categoryColor => CategoryColors.get(item.category.id);
 
@@ -373,8 +373,15 @@ class TaskCard extends StatelessWidget {
             ),
 
             // Category section (~1/4 width)
-            SizedBox(
+            Container(
               width: 76,
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.06),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(12),
+                  bottomLeft: Radius.circular(12),
+                ),
+              ),
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 child: Column(
@@ -389,7 +396,7 @@ class TaskCard extends StatelessWidget {
                       item.category.name.toUpperCase(),
                       style: GoogleFonts.inter(
                         color: color.withValues(alpha: 0.7),
-                        fontSize: 9,
+                        fontSize: 8,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 1.2,
                       ),
@@ -425,7 +432,7 @@ class TaskCard extends StatelessWidget {
                         style: GoogleFonts.inter(
                           color: Colors.white.withValues(alpha: 0.92),
                           fontSize: 14,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: isCenter ? FontWeight.w600 : FontWeight.w500,
                           height: 1.45,
                         ),
                       ),
@@ -451,6 +458,32 @@ class TaskCard extends StatelessWidget {
                               fontSize: 9,
                               fontWeight: FontWeight.w600,
                               letterSpacing: 0.8,
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(width: 6),
+
+                        // Points badge
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: color.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(
+                              color: color.withValues(alpha: 0.35),
+                              width: 1,
+                            ),
+                          ),
+                          child: Text(
+                            '+${item.task.points}',
+                            style: GoogleFonts.inter(
+                              color: color,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
                         ),

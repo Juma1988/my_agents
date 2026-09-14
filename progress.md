@@ -29,6 +29,10 @@
 ## 2026-09-14 23:15 — Yuna · Logic — Redesign TaskCard with premium Row-based layout
 - Changed: `lib/widgets/category_card_wheel.dart` (replaced TaskCard with Row-based layout, left accent bar, dark gradient bg, tier/timer pills, 3-line text, 130px height)
 - Verified: `flutter analyze` ✅ (0 issues)
-## 2026-09-14 12:45 � Yuna � Logic � Category card wheel: vertical category section, removed clickability, shuffled pool
+## 2026-09-14 12:45 � Yuna � Logic � Category card wheel: vertical category section, removed clickability, shuffled pool
 - Changed: lib/widgets/category_card_wheel.dart, lib/screens/spin_screen.dart
 - Verified: flutter analyze (0 issues), flutter run on emulator-5554 (launched successfully)
+
+## 2026-09-14 23:45 — Yuna · Logic — TaskCard refinements: points badge, taller card, category tint, center bold, font size
+- Changed: lib/widgets/category_card_wheel.dart (cardHeight 140, points badge in bottom row, category section tinted bg, center w600, category name 8px)
+- Verified: flutter analyze — 0 issues
