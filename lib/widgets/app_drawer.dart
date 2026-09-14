@@ -178,93 +178,81 @@ class AppDrawer extends StatelessWidget {
   Widget _buildCategoryGrid(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          childAspectRatio: 1.1,
-          crossAxisSpacing: 8,
-          mainAxisSpacing: 8,
-        ),
-        itemCount: categories.length,
-        itemBuilder: (context, index) {
-          final cat = categories[index];
+      child: Column(
+        children: categories.map((cat) {
           final isSelected = selectedCategoryIds.contains(cat.id);
           final color = CategoryColors.get(cat.id);
           final shortName = shortNames[cat.id] ?? cat.name.substring(0, 3);
           final description = categoryDescriptions[cat.id] ?? '';
 
-          return GestureDetector(
-            onTap: () {
-              HapticFeedback.selectionClick();
-              _toggleCategory(cat.id, context);
-            },
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeOutCubic,
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? color.withValues(alpha: 0.25)
-                    : Colors.white.withValues(alpha: 0.05),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: GestureDetector(
+              onTap: () {
+                HapticFeedback.selectionClick();
+                _toggleCategory(cat.id, context);
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeOutCubic,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
                   color: isSelected
-                      ? color.withValues(alpha: 0.7)
-                      : Colors.white.withValues(alpha: 0.1),
-                  width: isSelected ? 2 : 1,
+                      ? color.withValues(alpha: 0.25)
+                      : Colors.white.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isSelected
+                        ? color.withValues(alpha: 0.7)
+                        : Colors.white.withValues(alpha: 0.1),
+                    width: isSelected ? 2 : 1,
+                  ),
                 ),
-                boxShadow: isSelected
-                    ? [
-                        BoxShadow(
-                          color: color.withValues(alpha: 0.2),
-                          blurRadius: 8,
-                          spreadRadius: 1,
-                        ),
-                      ]
-                    : [],
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(6),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                child: Row(
                   children: [
-                    Text(cat.icon, style: const TextStyle(fontSize: 22)),
-                    const SizedBox(height: 2),
-                    Text(
-                      shortName,
-                      style: GoogleFonts.inter(
-                        color: isSelected
-                            ? Colors.white
-                            : Colors.white.withValues(alpha: 0.5),
-                        fontSize: 11,
-                        fontWeight:
-                            isSelected ? FontWeight.w700 : FontWeight.w500,
+                    // Icon
+                    Text(cat.icon, style: const TextStyle(fontSize: 20)),
+                    const SizedBox(width: 12),
+                    // Name + description
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            shortName,
+                            style: GoogleFonts.inter(
+                              color: isSelected
+                                  ? Colors.white
+                                  : Colors.white.withValues(alpha: 0.6),
+                              fontSize: 13,
+                              fontWeight:
+                                  isSelected ? FontWeight.w700 : FontWeight.w500,
+                            ),
+                          ),
+                          Text(
+                            description,
+                            style: GoogleFonts.inter(
+                              color: Colors.white38,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    Text(
-                      description,
-                      style: GoogleFonts.inter(
-                        color: Colors.white38,
-                        fontSize: 7,
-                        fontWeight: FontWeight.w400,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                    ),
+                    // Checkmark
                     if (isSelected)
                       Icon(
                         Icons.check_circle,
                         color: color.withValues(alpha: 0.9),
-                        size: 12,
+                        size: 18,
                       ),
                   ],
                 ),
               ),
             ),
           );
-        },
+        }).toList(),
       ),
     );
   }
