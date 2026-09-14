@@ -392,23 +392,6 @@ class _SpinScreenState extends State<SpinScreen> {
         bottom: false,
         child: Row(
           children: [
-            // Menu button
-            IconButton(
-              icon: Icon(
-                Icons.menu,
-                color: textColor,
-                size: 24,
-              ),
-              onPressed: () {
-                _scaffoldKey.currentState?.openEndDrawer();
-              },
-              splashRadius: 20,
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              constraints: const BoxConstraints(),
-            ),
-
-            const SizedBox(width: 4),
-
             // Player 1
             Expanded(
               child: GestureDetector(
@@ -463,6 +446,23 @@ class _SpinScreenState extends State<SpinScreen> {
                   isCurrent: _currentPlayer == 2,
                 ),
               ),
+            ),
+
+            const SizedBox(width: 4),
+
+            // Menu button (right side)
+            IconButton(
+              icon: Icon(
+                Icons.menu,
+                color: textColor,
+                size: 24,
+              ),
+              onPressed: () {
+                _scaffoldKey.currentState?.openEndDrawer();
+              },
+              splashRadius: 20,
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              constraints: const BoxConstraints(),
             ),
           ],
         ),
