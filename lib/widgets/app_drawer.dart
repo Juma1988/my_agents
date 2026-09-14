@@ -37,11 +37,15 @@ class AppDrawer extends StatelessWidget {
     'two_player': '2Ply',
   };
 
-  /// Descriptions for each tier
-  static const Map<String, String> tierDescriptions = {
-    'soft': 'Light fun, flirty, tame tasks',
-    'kink': 'Spicy, intimate, boundary-pushing',
-    'entertainment': 'Bold, wild, anything-goes tasks',
+  /// Descriptions for each category
+  static const Map<String, String> categoryDescriptions = {
+    'domestic': 'House chores with a twist',
+    'dirty_truth': 'Dare to tell the truth',
+    'spicy_dare': 'Bold dares, no backing down',
+    'roleplay': 'Pretend, pretend, enjoy',
+    'sensation': 'Touch, feel, lose control',
+    'wildcard': 'Surprise, anything goes',
+    'two_player': 'Couple tasks, double the fun',
   };
 
   void _toggleCategory(String categoryId, BuildContext context) {
@@ -179,7 +183,7 @@ class AppDrawer extends StatelessWidget {
         physics: const NeverScrollableScrollPhysics(),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 3,
-          childAspectRatio: 1.0,
+          childAspectRatio: 1.1,
           crossAxisSpacing: 8,
           mainAxisSpacing: 8,
         ),
@@ -189,6 +193,7 @@ class AppDrawer extends StatelessWidget {
           final isSelected = selectedCategoryIds.contains(cat.id);
           final color = CategoryColors.get(cat.id);
           final shortName = shortNames[cat.id] ?? cat.name.substring(0, 3);
+          final description = categoryDescriptions[cat.id] ?? '';
 
           return GestureDetector(
             onTap: () {
@@ -219,29 +224,43 @@ class AppDrawer extends StatelessWidget {
                       ]
                     : [],
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(cat.icon, style: const TextStyle(fontSize: 22)),
-                  const SizedBox(height: 4),
-                  Text(
-                    shortName,
-                    style: GoogleFonts.inter(
-                      color: isSelected
-                          ? Colors.white
-                          : Colors.white.withValues(alpha: 0.5),
-                      fontSize: 11,
-                      fontWeight:
-                          isSelected ? FontWeight.w700 : FontWeight.w500,
+              child: Padding(
+                padding: const EdgeInsets.all(6),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(cat.icon, style: const TextStyle(fontSize: 22)),
+                    const SizedBox(height: 2),
+                    Text(
+                      shortName,
+                      style: GoogleFonts.inter(
+                        color: isSelected
+                            ? Colors.white
+                            : Colors.white.withValues(alpha: 0.5),
+                        fontSize: 11,
+                        fontWeight:
+                            isSelected ? FontWeight.w700 : FontWeight.w500,
+                      ),
                     ),
-                  ),
-                  if (isSelected)
-                    Icon(
-                      Icons.check_circle,
-                      color: color.withValues(alpha: 0.9),
-                      size: 12,
+                    Text(
+                      description,
+                      style: GoogleFonts.inter(
+                        color: Colors.white38,
+                        fontSize: 7,
+                        fontWeight: FontWeight.w400,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
                     ),
-                ],
+                    if (isSelected)
+                      Icon(
+                        Icons.check_circle,
+                        color: color.withValues(alpha: 0.9),
+                        size: 12,
+                      ),
+                  ],
+                ),
               ),
             ),
           );
@@ -298,40 +317,22 @@ class AppDrawer extends StatelessWidget {
           ),
         ),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: TextStyle(
-                      color: selected ? Colors.white : Colors.white38,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    tierDescriptions[tier] ?? '',
-                    style: GoogleFonts.inter(
-                      color: Colors.white38,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ],
+            Text(
+              label,
+              style: TextStyle(
+                color: selected ? Colors.white : Colors.white38,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
               ),
             ),
+            const Spacer(),
             if (selected)
-              const Padding(
-                padding: EdgeInsets.only(top: 2),
-                child: Icon(
-                  Icons.check_circle,
-                  color: Color(0xFF4ECDC4),
-                  size: 16,
-                ),
+              const Icon(
+                Icons.check_circle,
+                color: Color(0xFF4ECDC4),
+                size: 16,
               ),
           ],
         ),
