@@ -50,6 +50,12 @@ class _SpinScreenState extends State<SpinScreen> {
   static const int _skipCooldownQuickSkip = 3;
   Map<int, int> _skipCooldowns = {1: 0, 2: 0};
 
+  // Save for Later (Bookmark skill, per-player, persists in Hive)
+  static const int _saveCooldownMax = 5;
+  static const int _saveMaxQueued = 3;
+  Map<int, int> _saveCooldowns = {1: 0, 2: 0};
+  Map<int, List<Map<String, dynamic>>> _savedTasks = {1: [], 2: []};
+
   // Session tracking (resets on full app close)
   late Map<int, int> _sessionStartScores;
 
@@ -148,6 +154,22 @@ class _SpinScreenState extends State<SpinScreen> {
       2: _settingsBox.get('player2_skip_cooldown', defaultValue: 0) as int,
     };
 
+    // Load saved tasks from Hive
+    for (final p in [1, 2]) {
+      final raw = _settingsBox.get('player${p}_saved_tasks', defaultValue: null);
+      if (raw != null && raw is List) {
+        _savedTasks[p] = List<Map<String, dynamic>>.from(
+          raw.map((e) => Map<String, dynamic>.from(e as Map)),
+        );
+      } else {
+        _savedTasks[p] = [];
+      }
+    }
+    _saveCooldowns = {
+      1: _settingsBox.get('player1_save_cooldown', defaultValue: 0) as int,
+      2: _settingsBox.get('player2_save_cooldown', defaultValue: 0) as int,
+    };
+
     setState(() {
       _categories = categories;
       _isLoading = false;
@@ -173,6 +195,10 @@ class _SpinScreenState extends State<SpinScreen> {
     _settingsBox.put('player2_avatar', _avatars[2]);
     _settingsBox.put('player1_skip_cooldown', _skipCooldowns[1]);
     _settingsBox.put('player2_skip_cooldown', _skipCooldowns[2]);
+    _settingsBox.put('player1_saved_tasks', _savedTasks[1]);
+    _settingsBox.put('player2_saved_tasks', _savedTasks[2]);
+    _settingsBox.put('player1_save_cooldown', _saveCooldowns[1]);
+    _settingsBox.put('player2_save_cooldown', _saveCooldowns[2]);
   }
 
   void _onCategorySelectionChanged(List<String> newSelection) {
@@ -189,12 +215,144 @@ class _SpinScreenState extends State<SpinScreen> {
     _saveSettings();
   }
 
+  /// Save current task for later (Bookmark skill)
+  void _saveTaskForLater(ChallengeCategory category, ChallengeSegment task) {
+    final player = _currentPlayer;
+    final queue = _savedTasks[player] ?? [];
+
+    // Check: Bookmark skill owned?
+    if (!ShopService.hasSkill(player, 'bookmark')) return;
+    // Check: cooldown active?
+    if ((_saveCooldowns[player] ?? 0) > 0) return;
+    // Check: queue full?
+    if (queue.length >= _saveMaxQueued) return;
+
+    queue.add({
+      'categoryId': category.id,
+      'categoryName': category.name,
+      'categoryIcon': category.icon,
+      'taskId': task.id,
+      'taskText': task.text,
+      'taskPoints': task.points,
+      'hasTimer': task.hasTimer,
+      'timerSeconds': task.timerSeconds,
+      'tier': _selectedTiers.first,
+    });
+
+    setState(() {
+      _savedTasks[player] = queue;
+      _saveCooldowns[player] = _saveCooldownMax;
+    });
+    _savePlayerData();
+  }
+
+  /// Check if player has saved tasks pending
+  bool _hasSavedTasks() {
+    return (_savedTasks[_currentPlayer]?.isNotEmpty ?? false);
+  }
+
+  /// Show saved tasks queue before spinning
+  void _showSavedTasksQueue() {
+    final queue = _savedTasks[_currentPlayer] ?? [];
+    if (queue.isEmpty) return;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _SavedTasksSheet(
+        savedTasks: queue,
+        playerName: _nicknames[_currentPlayer]!,
+        onAcceptAll: () {
+          Navigator.of(context).pop();
+          _startNextSavedTask();
+        },
+        onSkipAll: () {
+          Navigator.of(context).pop();
+          _skipAllSavedTasks();
+        },
+      ),
+    );
+  }
+
+  /// Start the first saved task in the queue
+  void _startNextSavedTask() {
+    final queue = _savedTasks[_currentPlayer] ?? [];
+    if (queue.isEmpty) {
+      // No saved tasks, proceed to spin
+      _handleSpin();
+      return;
+    }
+
+    final saved = queue.removeAt(0);
+    setState(() {
+      _savedTasks[_currentPlayer] = queue;
+    });
+    _savePlayerData();
+
+    // Find the category to show the task
+    final category = _categories.firstWhere(
+      (c) => c.id == saved['categoryId'],
+      orElse: () => _categories.first,
+    );
+    final task = ChallengeSegment(
+      id: saved['taskId'],
+      text: saved['taskText'],
+      points: saved['taskPoints'],
+      timerSeconds: saved['timerSeconds'],
+    );
+
+    _showTaskBottomSheet(category, task);
+  }
+
+  /// Skip all saved tasks (counts as multiple skips on cooldown)
+  void _skipAllSavedTasks() {
+    final queue = _savedTasks[_currentPlayer] ?? [];
+    if (queue.isEmpty) return;
+
+    final player = _currentPlayer;
+    final playerName = _nicknames[player]!;
+
+    // Each skipped saved task is a penalty + history entry
+    int totalPenalty = 0;
+    for (final saved in queue) {
+      final points = saved['taskPoints'] as int;
+      totalPenalty += points;
+
+      HistoryService.record(
+        taskId: saved['taskId'],
+        categoryId: saved['categoryId'],
+        categoryName: saved['categoryName'],
+        categoryIcon: saved['categoryIcon'],
+        tier: saved['tier'],
+        taskText: saved['taskText'],
+        points: points,
+        accepted: false,
+        player: player,
+        playerName: playerName,
+      );
+    }
+
+    setState(() {
+      _scores[player] = (_scores[player] ?? 0) - totalPenalty;
+      _savedTasks[player] = [];
+      // Skip cooldown applies (multiple skips = one cooldown)
+      final hasQuickSkip = ShopService.hasSkill(player, 'quick_skip');
+      _skipCooldowns[player] = hasQuickSkip ? _skipCooldownQuickSkip : _skipCooldownMax;
+    });
+    _savePlayerData();
+    _showFloatingScore(totalPenalty, isAccept: false);
+  }
+
   /// Toggle to the other player
   void _togglePlayer() {
-    // Decrement cooldown for the player whose turn just ended
+    // Decrement cooldowns for the player whose turn just ended
     final endingPlayer = _currentPlayer;
     if ((_skipCooldowns[endingPlayer] ?? 0) > 0) {
       _skipCooldowns[endingPlayer] = _skipCooldowns[endingPlayer]! - 1;
+    }
+    if ((_saveCooldowns[endingPlayer] ?? 0) > 0) {
+      _saveCooldowns[endingPlayer] = _saveCooldowns[endingPlayer]! - 1;
     }
     setState(() {
       _currentPlayer = _currentPlayer == 1 ? 2 : 1;
@@ -203,6 +361,12 @@ class _SpinScreenState extends State<SpinScreen> {
   }
 
   void _handleSpin() {
+    // Check for saved tasks first
+    if (_hasSavedTasks()) {
+      _showSavedTasksQueue();
+      return;
+    }
+
     final activeCategories = _categories
         .where((c) => _selectedCategoryIds.contains(c.id))
         .toList();
@@ -249,6 +413,17 @@ class _SpinScreenState extends State<SpinScreen> {
         category: category,
         task: task,
         skipCooldown: _skipCooldowns[_currentPlayer] ?? 0,
+        canSave: ShopService.hasSkill(_currentPlayer, 'bookmark'),
+        saveCooldown: _saveCooldowns[_currentPlayer] ?? 0,
+        onSave: () {
+          SoundService.tap();
+          Navigator.of(context).pop();
+          _saveTaskForLater(category, task);
+          // Player spins again immediately
+          Future.delayed(const Duration(milliseconds: 300), () {
+            if (mounted) _handleSpin();
+          });
+        },
         onAccept: () {
           SoundService.accept();
           // Close the bottom sheet first
@@ -752,6 +927,9 @@ class _TaskDetailSheet extends StatefulWidget {
     required this.skipCooldown,
     required this.onAccept,
     required this.onSkip,
+    this.onSave,
+    this.saveCooldown = 0,
+    this.canSave = false,
   });
 
   final ChallengeCategory category;
@@ -759,6 +937,9 @@ class _TaskDetailSheet extends StatefulWidget {
   final int skipCooldown;
   final VoidCallback onAccept;
   final VoidCallback onSkip;
+  final VoidCallback? onSave;
+  final int saveCooldown;
+  final bool canSave;
 
   @override
   State<_TaskDetailSheet> createState() => _TaskDetailSheetState();
@@ -1019,6 +1200,46 @@ class _TaskDetailSheetState extends State<_TaskDetailSheet> {
           ),
           const SizedBox(height: 12),
 
+          // Save for Later button (Bookmark skill)
+          if (widget.canSave) ...[
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: OutlinedButton.icon(
+                onPressed: widget.saveCooldown > 0
+                    ? null
+                    : () {
+                        _timer?.cancel();
+                        widget.onSave?.call();
+                      },
+                icon: const Icon(Icons.bookmark_add_outlined, size: 18),
+                label: Text(
+                  widget.saveCooldown > 0
+                      ? 'Save for Later (${widget.saveCooldown} rounds)'
+                      : 'Save for Later',
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: widget.saveCooldown > 0
+                      ? Colors.white24
+                      : const Color(0xFFFFB300),
+                  side: BorderSide(
+                    color: widget.saveCooldown > 0
+                        ? Colors.white.withValues(alpha: 0.08)
+                        : const Color(0xFFFFB300).withValues(alpha: 0.5),
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+
           // Skip button
           Builder(
             builder: (context) {
@@ -1087,6 +1308,176 @@ class _TaskDetailSheetState extends State<_TaskDetailSheet> {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Bottom sheet showing saved tasks queue.
+class _SavedTasksSheet extends StatelessWidget {
+  const _SavedTasksSheet({
+    required this.savedTasks,
+    required this.playerName,
+    required this.onAcceptAll,
+    required this.onSkipAll,
+  });
+
+  final List<Map<String, dynamic>> savedTasks;
+  final String playerName;
+  final VoidCallback onAcceptAll;
+  final VoidCallback onSkipAll;
+
+  @override
+  Widget build(BuildContext context) {
+    final totalPoints = savedTasks.fold<int>(
+        0, (sum, t) => sum + (t['taskPoints'] as int));
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: const BoxDecoration(
+        color: Color(0xFF252542),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Drag handle
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.3),
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Header
+          Text(
+            '🔖 $playerName\'s Saved Tasks',
+            style: GoogleFonts.inter(
+              color: const Color(0xFFFFB300),
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '${savedTasks.length} task${savedTasks.length == 1 ? '' : 's'} · $totalPoints pts total',
+            style: GoogleFonts.inter(
+              color: Colors.white54,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Task list
+          ...savedTasks.map((task) {
+            final pts = task['taskPoints'] as int;
+            return Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.05),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: const Color(0xFFFFB300).withValues(alpha: 0.2),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Text(
+                    '${task['categoryIcon']}',
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          task['taskText'] as String,
+                          style: GoogleFonts.inter(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '+$pts pts',
+                          style: GoogleFonts.inter(
+                            color: Colors.greenAccent,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+
+          const SizedBox(height: 16),
+
+          // Accept all button
+          SizedBox(
+            width: double.infinity,
+            height: 52,
+            child: ElevatedButton(
+              onPressed: onAcceptAll,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.accent,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(28),
+                ),
+                elevation: 0,
+              ),
+              child: Text(
+                'Complete Saved Tasks',
+                style: GoogleFonts.inter(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+
+          // Skip all button
+          SizedBox(
+            width: double.infinity,
+            height: 48,
+            child: OutlinedButton(
+              onPressed: onSkipAll,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.white54,
+                side: BorderSide(
+                  color: Colors.white.withValues(alpha: 0.15),
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(28),
+                ),
+              ),
+              child: Text(
+                'Skip All (−$totalPoints pts + cooldown)',
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
+      ),
     );
   }
 }
