@@ -13,6 +13,7 @@ import '../widgets/app_drawer.dart';
 import '../widgets/category_card_wheel.dart';
 import '../widgets/confetti_overlay.dart';
 import '../theme/app_colors.dart';
+import '../main.dart';
 
 import '../widgets/spin_button.dart';
 import '../widgets/wheel_pointer.dart';
@@ -545,6 +546,29 @@ class _SpinScreenState extends State<SpinScreen> {
                 child: Transform.rotate(
                   angle: 0,
                   child: const WheelPointer(),
+                ),
+              ),
+              // Restart button (top-left)
+              Positioned(
+                top: 8,
+                left: 8,
+                child: GestureDetector(
+                  onLongPress: () {
+                    SoundService.tap();
+                    RestartWidget.restartApp(context);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      Icons.refresh,
+                      color: Colors.white.withValues(alpha: 0.15),
+                      size: 16,
+                    ),
+                  ),
                 ),
               ),
             ],
