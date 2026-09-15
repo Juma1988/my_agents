@@ -126,8 +126,10 @@ class CategoryCardWheelState extends State<CategoryCardWheel> {
     }
 
     _rolling = true;
+    final startOffset = _controller.offset;
 
     // Add listener for haptic ticks during spin
+    // Intensity increases as wheel decelerates (early = light, late = heavy)
     void tickListener() {
       final pool = _taskPool;
       if (pool.isEmpty) return;
@@ -135,7 +137,13 @@ class CategoryCardWheelState extends State<CategoryCardWheel> {
       final currentReal = _realIndex(currentCenter);
       if (currentReal != _lastTickedIndex && _lastTickedIndex != -1) {
         _lastTickedIndex = currentReal;
-        SoundService.wheelTick();
+        // Calculate progress: 0 = start, 1 = end
+        final totalDistance = (landingVirtual - startOffset).abs();
+        final currentDistance = (_controller.offset - startOffset).abs();
+        final progress = totalDistance > 0
+            ? (currentDistance / totalDistance).clamp(0.0, 1.0)
+            : 0.5;
+        SoundService.wheelTick(intensity: progress);
       }
       _lastTickedIndex = currentReal;
     }

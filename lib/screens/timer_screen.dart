@@ -79,8 +79,10 @@ class _TimerScreenState extends State<TimerScreen>
         });
 
         // Vibrate at 30s and 10s markers
-        if (_remainingSeconds == 30 || _remainingSeconds == 10) {
-          SoundService.timerWarning();
+        if (_remainingSeconds == 30) {
+          SoundService.timerWarning30();
+        } else if (_remainingSeconds == 10) {
+          SoundService.timerWarning10();
         }
       } else {
         timer.cancel();

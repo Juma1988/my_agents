@@ -18,22 +18,37 @@ class SoundService {
     return box.get('haptic_enabled', defaultValue: true) == true;
   }
 
+  // ── Wheel Sounds ──
+
   /// Tick sound during wheel spin — one per card pass.
-  static void wheelTick() {
+  /// Use [intensity] to vary feel: 0 = light (early), 1 = heavy (late).
+  static void wheelTick({double intensity = 0.5}) {
     if (!_hapticEnabled) return;
-    HapticFeedback.selectionClick();
+    if (intensity > 0.7) {
+      HapticFeedback.mediumImpact();
+    } else {
+      HapticFeedback.selectionClick();
+    }
   }
 
   /// Heavy thud when wheel lands on final position.
-  static void wheelLand() {
+  /// Double impact for satisfying "thunk".
+  static void wheelLand() async {
     if (!_hapticEnabled) return;
+    HapticFeedback.heavyImpact();
+    await Future.delayed(const Duration(milliseconds: 80));
     HapticFeedback.mediumImpact();
   }
 
+  // ── Action Sounds ──
+
   /// Success chime when player accepts a task.
-  static void accept() {
+  /// Double tap for positive feel.
+  static void accept() async {
     if (!_hapticEnabled) return;
     HapticFeedback.mediumImpact();
+    await Future.delayed(const Duration(milliseconds: 100));
+    HapticFeedback.lightImpact();
   }
 
   /// Subtle buzz when player skips a task.
@@ -54,10 +69,32 @@ class SoundService {
     HapticFeedback.selectionClick();
   }
 
-  /// Timer warning at 30s and 10s.
-  static void timerWarning() {
+  /// Task revealed — whoosh feel.
+  static void taskRevealed() async {
+    if (!_hapticEnabled) return;
+    HapticFeedback.lightImpact();
+    await Future.delayed(const Duration(milliseconds: 50));
+    HapticFeedback.selectionClick();
+  }
+
+  // ── Timer Sounds ──
+
+  /// Timer warning at 30s — double beep pattern.
+  static void timerWarning30() async {
     if (!_hapticEnabled) return;
     HapticFeedback.mediumImpact();
+    await Future.delayed(const Duration(milliseconds: 150));
+    HapticFeedback.mediumImpact();
+  }
+
+  /// Timer warning at 10s — urgent triple beep.
+  static void timerWarning10() async {
+    if (!_hapticEnabled) return;
+    HapticFeedback.heavyImpact();
+    await Future.delayed(const Duration(milliseconds: 100));
+    HapticFeedback.heavyImpact();
+    await Future.delayed(const Duration(milliseconds: 100));
+    HapticFeedback.heavyImpact();
   }
 
   /// Timer expired — alarm.
@@ -84,5 +121,24 @@ class SoundService {
       }
       HapticFeedback.heavyImpact();
     });
+  }
+
+  // ── Celebration ──
+
+  /// Confetti burst feel — rapid light taps.
+  static void celebration() async {
+    if (!_hapticEnabled) return;
+    for (int i = 0; i < 3; i++) {
+      HapticFeedback.lightImpact();
+      await Future.delayed(const Duration(milliseconds: 60));
+    }
+  }
+
+  // ── Skip Cooldown ──
+
+  /// Denied action — low buzz.
+  static void denied() {
+    if (!_hapticEnabled) return;
+    HapticFeedback.heavyImpact();
   }
 }

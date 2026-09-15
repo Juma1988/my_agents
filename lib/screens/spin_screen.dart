@@ -255,6 +255,7 @@ class _SpinScreenState extends State<SpinScreen> {
       // Small delay so the final card settles before the sheet pops up
       Future.delayed(const Duration(milliseconds: 400), () {
         if (!mounted) return;
+        SoundService.taskRevealed();
         _showTaskBottomSheet(taskItem.category, taskItem.task);
       });
     });
@@ -315,7 +316,10 @@ class _SpinScreenState extends State<SpinScreen> {
                   playerName: _nicknames[_currentPlayer == 1 ? 2 : 1]!,
                 );
                 // Confetti celebration
-                if (mounted) ConfettiOverlay.show(context);
+                if (mounted) {
+                  SoundService.celebration();
+                  ConfettiOverlay.show(context);
+                }
               }
               // Cancel: no points, no toggle
             });
@@ -344,7 +348,10 @@ class _SpinScreenState extends State<SpinScreen> {
               playerName: completedByName,
             );
             // Confetti celebration
-            if (mounted) ConfettiOverlay.show(context);
+            if (mounted) {
+              SoundService.celebration();
+              ConfettiOverlay.show(context);
+            }
           }
         },
         onSkip: () {
