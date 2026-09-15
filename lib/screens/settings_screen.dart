@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 import '../data/history_service.dart';
 import '../data/sound_service.dart';
+import '../data/progression_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/custom_snackbar.dart';
 
@@ -22,6 +23,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _hapticEnabled = true;
   bool _soundEnabled = true;
 
+  // Player profiles
+  String _player1Nickname = 'Player 1';
+  String _player2Nickname = 'Player 2';
+  String _player1Avatar = '😈';
+  String _player2Avatar = '👿';
+
+  /// Available avatars for player profiles
+  static const List<String> avatarEmojis = [
+    '😈', '👿', '😎', '🥵', '🦊', '🐱', '🐶',
+    '👸', '🤴', '💃', '🕺', '👻', '💀', '🔥', '💎',
+    '🎭', '🎲', '🃏', '🎪', '🎯', '🪄', '💫', '🌙',
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -29,6 +43,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _hideCompleted = _box.get('hide_completed', defaultValue: 'disable');
     _hapticEnabled = _box.get('haptic_enabled', defaultValue: true);
     _soundEnabled = _box.get('sound_enabled', defaultValue: true);
+    _player1Nickname = _box.get('player1_nickname', defaultValue: 'Player 1');
+    _player2Nickname = _box.get('player2_nickname', defaultValue: 'Player 2');
+    _player1Avatar = _box.get('player1_avatar', defaultValue: '😈');
+    _player2Avatar = _box.get('player2_avatar', defaultValue: '👿');
   }
 
   void _saveSetting(String key, dynamic value) {
@@ -58,6 +76,46 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 16),
         children: [
+          // ── Profiles Section ──
+          _buildSectionLabel('PROFILES'),
+          const SizedBox(height: 10),
+          _buildPlayerProfile(
+            context,
+            label: 'Player 1',
+            nickname: _player1Nickname,
+            avatar: _player1Avatar,
+            onNicknameChanged: (val) {
+              setState(() => _player1Nickname = val);
+              _saveSetting('player1_nickname', val);
+            },
+            onAvatarChanged: (val) {
+              setState(() => _player1Avatar = val);
+              _saveSetting('player1_avatar', val);
+            },
+          ),
+          const SizedBox(height: 8),
+          _buildPlayerProfile(
+            context,
+            label: 'Player 2',
+            nickname: _player2Nickname,
+            avatar: _player2Avatar,
+            onNicknameChanged: (val) {
+              setState(() => _player2Nickname = val);
+              _saveSetting('player2_nickname', val);
+            },
+            onAvatarChanged: (val) {
+              setState(() => _player2Avatar = val);
+              _saveSetting('player2_avatar', val);
+            },
+          ),
+          const SizedBox(height: 8),
+          // Progression summary
+          _buildProgressionSummary(),
+
+          const SizedBox(height: 24),
+          const Divider(color: Colors.white12, height: 1),
+          const SizedBox(height: 24),
+
           // ── Completed Tasks Section ──
           _buildSectionLabel('COMPLETED TASKS'),
           const SizedBox(height: 8),
@@ -128,6 +186,296 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  // ── Profiles Section ──
+
+  Widget _buildPlayerProfile(
+    BuildContext context, {
+    required String label,
+    required String nickname,
+    required String avatar,
+    required ValueChanged<String> onNicknameChanged,
+    required ValueChanged<String> onAvatarChanged,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.1),
+          ),
+        ),
+        child: Row(
+          children: [
+            // Avatar (tap to change)
+            GestureDetector(
+              onTap: () {
+                SoundService.select();
+                _showAvatarPicker(context, '$label Avatar', avatar, onAvatarChanged);
+              },
+              child: Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: AppColors.accent.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppColors.accent.withValues(alpha: 0.3),
+                  ),
+                ),
+                alignment: Alignment.center,
+                child: Text(avatar, style: const TextStyle(fontSize: 28)),
+              ),
+            ),
+            const SizedBox(width: 14),
+            // Nickname + label
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: GoogleFonts.inter(
+                      color: Colors.white38,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  GestureDetector(
+                    onTap: () {
+                      SoundService.select();
+                      _showNicknameDialog(
+                          context, '$label Nickname', nickname, onNicknameChanged);
+                    },
+                    child: Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            nickname,
+                            style: GoogleFonts.inter(
+                              color: Colors.white,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Icon(
+                          Icons.edit,
+                          color: Colors.white.withValues(alpha: 0.3),
+                          size: 14,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Change avatar button
+            GestureDetector(
+              onTap: () {
+                SoundService.select();
+                _showAvatarPicker(context, '$label Avatar', avatar, onAvatarChanged);
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: AppColors.accent.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  'Avatar',
+                  style: GoogleFonts.inter(
+                    color: AppColors.accent,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProgressionSummary() {
+    final total = ProgressionService.totalCompleted;
+    final progress = ProgressionService.nextTierUnlock;
+    final earned = ProgressionService.earnedMilestones;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.trending_up, color: AppColors.accent.withValues(alpha: 0.7), size: 20),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '$total tasks completed · ${earned.length} milestones',
+                    style: GoogleFonts.inter(
+                      color: Colors.white70,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  if (!progress.isComplete) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      '${progress.current}/${progress.target} to unlock ${progress.tierName}',
+                      style: GoogleFonts.inter(
+                        color: Colors.white38,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showNicknameDialog(
+      BuildContext context, String title, String current, ValueChanged<String> onChanged) {
+    final controller = TextEditingController(text: current);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF252542),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          title,
+          style: GoogleFonts.inter(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        content: TextField(
+          controller: controller,
+          style: const TextStyle(color: Colors.white),
+          decoration: InputDecoration(
+            hintText: 'Enter nickname',
+            hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.4)),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
+            ),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: AppColors.accent),
+            ),
+          ),
+          autofocus: true,
+          onSubmitted: (value) {
+            if (value.trim().isNotEmpty) {
+              onChanged(value.trim());
+            }
+            Navigator.of(ctx).pop();
+          },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
+          ),
+          TextButton(
+            onPressed: () {
+              if (controller.text.trim().isNotEmpty) {
+                onChanged(controller.text.trim());
+              }
+              Navigator.of(ctx).pop();
+            },
+            child: Text('Save', style: TextStyle(color: AppColors.accent)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showAvatarPicker(
+      BuildContext context, String title, String current, ValueChanged<String> onChanged) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF252542),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => Container(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              title,
+              style: GoogleFonts.inter(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 16),
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 6,
+                mainAxisSpacing: 8,
+                crossAxisSpacing: 8,
+              ),
+              itemCount: avatarEmojis.length,
+              itemBuilder: (ctx, i) {
+                final emoji = avatarEmojis[i];
+                final isSelected = emoji == current;
+                return GestureDetector(
+                  onTap: () {
+                    SoundService.select();
+                    onChanged(emoji);
+                    Navigator.of(ctx).pop();
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? AppColors.accent.withValues(alpha: 0.3)
+                          : Colors.white.withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: isSelected
+                            ? AppColors.accent
+                            : Colors.white.withValues(alpha: 0.1),
+                        width: isSelected ? 2 : 1,
+                      ),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(emoji, style: const TextStyle(fontSize: 24)),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }
