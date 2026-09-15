@@ -4,7 +4,7 @@
 
 ## Current State
 
-Core app with onboarding, sound service, confetti, session scoring, history tracking, and settings.
+Core app with onboarding, sound service, confetti, session scoring, history tracking, settings, skip cooldown, enhanced sound engine, and progression system.
 
 ## Roadmap Phases
 
@@ -14,16 +14,10 @@ Core app with onboarding, sound service, confetti, session scoring, history trac
 | 2 | History & Settings | **Done** |
 | 3 | Skip Cooldown System | **Done** |
 | 4 | Sound & Vibration Engine | **Done** |
-| 5 | Progression (tier unlocking, milestones) | Planned |
-| 6 | Save for Later Skill | Planned |
+| 5 | Progression (tier unlocking, milestones) | **Done** |
+| 6 | Save for Later Skill | Next |
 | 7 | Shop System | Planned |
 | 8 | Future Ideas (backlog) | Backlog |
-
-## Phase 3 — Skip Cooldown (Next)
-
-- [ ] Skip cooldown: 10 player rounds between skips
-- [ ] Cooldown display on skip button
-- [ ] Shop skill: "Quick Skip" reduces to 3 rounds
 
 ## Blocked
 

@@ -9,6 +9,7 @@ All notable changes to Risk Roulette.
 - **Phase 2:** History screen, Settings page, done tracking, drawer navigation
 - **Phase 3:** Skip cooldown system (10 rounds per-player, persists in Hive)
 - **Phase 4:** Enhanced sound engine (variable tick intensity, double/triple beeps, celebration haptic, task reveal whoosh)
+- **Phase 5:** Progression system (tier unlocking at 25/50 tasks, milestones at 10/25/50/100, progress bar in drawer)
 
 ### Fixed
 - Removed 4 dead-code widgets: `score_bar`, `result_card`, `card_stack`, `category_chip_selector`
