@@ -48,7 +48,17 @@ lib/
 | Dark-only theme (#1A1A2E) | Locked |
 | 2-player mode with auto-switch | Locked |
 | Skip penalty = task.points (same player rolls again) | Locked |
-| Timer uses SystemSound fallback (no custom alarm asset yet) | Current |
+| Skip cooldown: 10 player rounds, skill reduces to 3 | Locked |
+| Tier unlock: Soft (start), Kink (25 done), Entertainment (50 done) | Locked |
+| Save for Later skill: max 3 saved, 2 tasks next turn, own cooldown | Locked |
+| Session score: green/red delta, resets on full app close | Locked |
+| Settings: hide completed tasks (Always Ask / Keep Favorite / Enable / Disable) | Locked |
+| Sound design: tick-tick-tick + landing thud | Planned |
+| Visual celebration: confetti on accept | Planned |
+
+## Roadmap
+
+See `docs/strategy/roadmap.md` for full phased plan (8 phases).
 
 ## Data
 

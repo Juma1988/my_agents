@@ -4,38 +4,39 @@
 
 ## Current State
 
-The core app is functional: spin wheel, task reveal, accept/skip, timer, 2-player scoring, persistence.
+Core app is functional: spin wheel, task reveal, accept/skip, timer, 2-player scoring, persistence.
 
-## What Works
+## Roadmap Phases
 
-- Spin wheel with task cards (ListWheelScrollView, 3D perspective)
-- Task bottom sheet with accept/skip/timer
-- Full-screen timer countdown with alarm + vibration
-- 2-player system with scores, nicknames, avatars
-- Drawer: category + tier selection, profile editing
-- Hive persistence (survives restart)
-- Error handling + retry for task loading
+| Phase | Name | Status |
+|-------|------|--------|
+| 1 | Core Polish (onboarding, sounds, celebration, session score) | **Next** |
+| 2 | History & Settings | Planned |
+| 3 | Skip Cooldown System | Planned |
+| 4 | Sound & Vibration Engine | Planned |
+| 5 | Progression (tier unlocking, milestones) | Planned |
+| 6 | Save for Later Skill | Planned |
+| 7 | Shop System | Planned |
+| 8 | Future Ideas (backlog) | Backlog |
 
-## What's Missing (Priority Order)
+## Phase 1 — Core Polish (Next)
 
-### HIGH
-1. Onboarding intro screen (3-slide "How to Play")
-2. Sound/haptic toggle in drawer (currently hardcoded on)
-3. Custom alarm sound (`assets/sounds/alarm.mp3`)
+- [ ] Onboarding screen (3-slide, first launch only)
+- [ ] Sound design (wheel tick, landing thud, accept chime, skip buzz)
+- [ ] Visual celebration (confetti on accept)
+- [ ] Session score display (green/red delta, resets on full close)
 
-### MEDIUM
-4. History screen (past tasks)
-5. Timer pause/resume
-6. Better test coverage
+## Phase 2 — History & Settings
 
-### LOW
-7. Shop system (spend points on items)
-8. Skills system (unlockable abilities)
+- [ ] History screen (drawer → history button, last 200 tasks)
+- [ ] Settings page (drawer → settings button)
+  - [ ] Hide completed tasks dropdown
+  - [ ] Haptic toggle
+  - [ ] Sound toggle
+  - [ ] Player reset
+  - [ ] Clear history
+- [ ] Done/favorite tracking per task
 
-## Active Blockers
+## Blocked
 
 None.
-
-## Next Action
-
-Onboarding screen is the most impactful next step.
