@@ -29,6 +29,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
   String _player2Nickname = 'Player 2';
   String _player1Avatar = '😈';
   String _player2Avatar = '👿';
+  int _player1Score = 0;
+  int _player2Score = 0;
+  int _player1SkipCooldown = 0;
+  int _player2SkipCooldown = 0;
 
   /// Available avatars for player profiles
   static const List<String> avatarEmojis = [
@@ -48,6 +52,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _player2Nickname = _box.get('player2_nickname', defaultValue: 'Player 2');
     _player1Avatar = _box.get('player1_avatar', defaultValue: '😈');
     _player2Avatar = _box.get('player2_avatar', defaultValue: '👿');
+    _player1Score = _box.get('player1_score', defaultValue: 0);
+    _player2Score = _box.get('player2_score', defaultValue: 0);
+    _player1SkipCooldown = _box.get('player1_skip_cooldown', defaultValue: 0);
+    _player2SkipCooldown = _box.get('player2_skip_cooldown', defaultValue: 0);
   }
 
   void _saveSetting(String key, dynamic value) {
@@ -85,6 +93,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             label: 'Player 1',
             nickname: _player1Nickname,
             avatar: _player1Avatar,
+            score: _player1Score,
+            skipCooldown: _player1SkipCooldown,
             onNicknameChanged: (val) {
               setState(() => _player1Nickname = val);
               _saveSetting('player1_nickname', val);
@@ -100,6 +110,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             label: 'Player 2',
             nickname: _player2Nickname,
             avatar: _player2Avatar,
+            score: _player2Score,
+            skipCooldown: _player2SkipCooldown,
             onNicknameChanged: (val) {
               setState(() => _player2Nickname = val);
               _saveSetting('player2_nickname', val);
@@ -236,6 +248,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required String label,
     required String nickname,
     required String avatar,
+    required int score,
+    required int skipCooldown,
     required ValueChanged<String> onNicknameChanged,
     required ValueChanged<String> onAvatarChanged,
   }) {
@@ -273,7 +287,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
             const SizedBox(width: 14),
-            // Nickname + label
+            // Nickname + label + stats
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -315,6 +329,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ),
                       ],
                     ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(Icons.star, color: AppColors.accent, size: 12),
+                      const SizedBox(width: 4),
+                      Text(
+                        '$score pts',
+                        style: GoogleFonts.inter(
+                          color: Colors.white54,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      if (skipCooldown > 0) ...[
+                        const SizedBox(width: 10),
+                        Icon(Icons.timer_off, color: Colors.white24, size: 12),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Skip: ${skipCooldown}r',
+                          style: GoogleFonts.inter(
+                            color: Colors.white24,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ],
               ),

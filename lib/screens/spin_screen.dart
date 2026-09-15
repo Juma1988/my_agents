@@ -186,34 +186,6 @@ class _SpinScreenState extends State<SpinScreen> {
     _saveSettings();
   }
 
-  void _onPlayer1NicknameChanged(String value) {
-    setState(() {
-      _nicknames[1] = value;
-    });
-    _savePlayerData();
-  }
-
-  void _onPlayer2NicknameChanged(String value) {
-    setState(() {
-      _nicknames[2] = value;
-    });
-    _savePlayerData();
-  }
-
-  void _onPlayer1AvatarChanged(String value) {
-    setState(() {
-      _avatars[1] = value;
-    });
-    _savePlayerData();
-  }
-
-  void _onPlayer2AvatarChanged(String value) {
-    setState(() {
-      _avatars[2] = value;
-    });
-    _savePlayerData();
-  }
-
   /// Toggle to the other player
   void _togglePlayer() {
     // Decrement cooldown for the player whose turn just ended
@@ -438,14 +410,6 @@ class _SpinScreenState extends State<SpinScreen> {
         onSelectionChanged: _onCategorySelectionChanged,
         selectedTiers: _selectedTiers,
         onTierChanged: _onTierChanged,
-        player1Nickname: _nicknames[1]!,
-        player2Nickname: _nicknames[2]!,
-        player1Avatar: _avatars[1]!,
-        player2Avatar: _avatars[2]!,
-        onPlayer1NicknameChanged: _onPlayer1NicknameChanged,
-        onPlayer2NicknameChanged: _onPlayer2NicknameChanged,
-        onPlayer1AvatarChanged: _onPlayer1AvatarChanged,
-        onPlayer2AvatarChanged: _onPlayer2AvatarChanged,
       ),
       body: SafeArea(
         child: _isLoading
