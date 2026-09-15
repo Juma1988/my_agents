@@ -60,6 +60,7 @@ hidden: false
 
 - **Name:** Ibrahim Juma
 - **Email:** i.juma1988@gmail.com
+- **Company ID:** com.i1988.<project_name>
 
 ---
 
