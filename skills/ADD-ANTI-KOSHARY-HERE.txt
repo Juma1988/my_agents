@@ -1,0 +1,3 @@
+Place the original owner's Anti-Koshary skill here as:
+.opencode/skills/<its-skill-id>/SKILL.md
+Do NOT place it under .opencode/agents/.
