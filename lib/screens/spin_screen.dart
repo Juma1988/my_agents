@@ -42,6 +42,10 @@ class _SpinScreenState extends State<SpinScreen> {
   Map<int, String> _nicknames = {1: 'Player 1', 2: 'Player 2'};
   Map<int, String> _avatars = {1: '😈', 2: '👿'};
 
+  // Skip cooldown (per-player, persists in Hive)
+  static const int _skipCooldownMax = 10;
+  Map<int, int> _skipCooldowns = {1: 0, 2: 0};
+
   // Session tracking (resets on full app close)
   late Map<int, int> _sessionStartScores;
 
@@ -133,6 +137,12 @@ class _SpinScreenState extends State<SpinScreen> {
       2: _settingsBox.get('player2_avatar', defaultValue: '👿') as String,
     };
 
+    // Load skip cooldowns from Hive
+    _skipCooldowns = {
+      1: _settingsBox.get('player1_skip_cooldown', defaultValue: 0) as int,
+      2: _settingsBox.get('player2_skip_cooldown', defaultValue: 0) as int,
+    };
+
     setState(() {
       _categories = categories;
       _isLoading = false;
@@ -156,6 +166,8 @@ class _SpinScreenState extends State<SpinScreen> {
     _settingsBox.put('player2_nickname', _nicknames[2]);
     _settingsBox.put('player1_avatar', _avatars[1]);
     _settingsBox.put('player2_avatar', _avatars[2]);
+    _settingsBox.put('player1_skip_cooldown', _skipCooldowns[1]);
+    _settingsBox.put('player2_skip_cooldown', _skipCooldowns[2]);
   }
 
   void _onCategorySelectionChanged(List<String> newSelection) {
@@ -202,6 +214,11 @@ class _SpinScreenState extends State<SpinScreen> {
 
   /// Toggle to the other player
   void _togglePlayer() {
+    // Decrement cooldown for the player whose turn just ended
+    final endingPlayer = _currentPlayer;
+    if ((_skipCooldowns[endingPlayer] ?? 0) > 0) {
+      _skipCooldowns[endingPlayer] = _skipCooldowns[endingPlayer]! - 1;
+    }
     setState(() {
       _currentPlayer = _currentPlayer == 1 ? 2 : 1;
     });
@@ -253,6 +270,7 @@ class _SpinScreenState extends State<SpinScreen> {
       builder: (context) => _TaskDetailSheet(
         category: category,
         task: task,
+        skipCooldown: _skipCooldowns[_currentPlayer] ?? 0,
         onAccept: () {
           SoundService.accept();
           // Close the bottom sheet first
@@ -336,6 +354,8 @@ class _SpinScreenState extends State<SpinScreen> {
           final skippedByName = _nicknames[_currentPlayer]!;
           setState(() {
             _scores[_currentPlayer] = (_scores[_currentPlayer] ?? 0) - task.points;
+            // Set skip cooldown for this player
+            _skipCooldowns[skippedBy] = _skipCooldownMax;
           });
           _savePlayerData();
           // Record history
@@ -719,12 +739,14 @@ class _TaskDetailSheet extends StatefulWidget {
   const _TaskDetailSheet({
     required this.category,
     required this.task,
+    required this.skipCooldown,
     required this.onAccept,
     required this.onSkip,
   });
 
   final ChallengeCategory category;
   final ChallengeSegment task;
+  final int skipCooldown;
   final VoidCallback onAccept;
   final VoidCallback onSkip;
 
@@ -988,29 +1010,45 @@ class _TaskDetailSheetState extends State<_TaskDetailSheet> {
           const SizedBox(height: 12),
 
           // Skip button
-          SizedBox(
-            width: double.infinity,
-            height: 56,
-            child: OutlinedButton(
-              onPressed: () {
-                _timer?.cancel();
-                widget.onSkip();
-              },
-              style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.white70,
-                side: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(28),
+          Builder(
+            builder: (context) {
+              final cooldown = widget.skipCooldown;
+              final onCooldown = cooldown > 0;
+              final skipLabel = onCooldown
+                  ? 'Skip ($cooldown round${cooldown == 1 ? '' : 's'} left)'
+                  : 'Skip (-${widget.task.points} pt${widget.task.points == 1 ? '' : 's'})';
+
+              return SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: OutlinedButton(
+                  onPressed: onCooldown
+                      ? null
+                      : () {
+                          _timer?.cancel();
+                          widget.onSkip();
+                        },
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: onCooldown ? Colors.white24 : Colors.white70,
+                    side: BorderSide(
+                      color: onCooldown
+                          ? Colors.white.withValues(alpha: 0.08)
+                          : Colors.white.withValues(alpha: 0.2),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(28),
+                    ),
+                  ),
+                  child: Text(
+                    skipLabel,
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ),
-              ),
-              child: Text(
-                'Skip (-${widget.task.points} pt${widget.task.points == 1 ? '' : 's'})',
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
+              );
+            },
           ),
           const SizedBox(height: 16),
         ],
