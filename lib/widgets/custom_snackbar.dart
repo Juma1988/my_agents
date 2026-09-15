@@ -8,6 +8,11 @@ class AppSnackBar {
   AppSnackBar._();
 
   static void show(BuildContext context, String message) {
+    // Close drawer if open so snackbar isn't hidden
+    final scaffold = Scaffold.maybeOf(context);
+    if (scaffold?.isDrawerOpen == true) {
+      Navigator.of(context).pop();
+    }
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
