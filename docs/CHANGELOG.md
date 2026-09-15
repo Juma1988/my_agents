@@ -8,6 +8,7 @@ All notable changes to Risk Roulette.
 - **Phase 1:** Onboarding, SoundService, ConfettiOverlay, session score delta
 - **Phase 2:** History screen, Settings page, done tracking, drawer navigation
 - **Phase 3:** Skip cooldown system (10 rounds per-player, persists in Hive)
+- **Phase 4:** Enhanced sound engine (variable tick intensity, double/triple beeps, celebration haptic, task reveal whoosh)
 
 ### Fixed
 - Removed 4 dead-code widgets: `score_bar`, `result_card`, `card_stack`, `category_chip_selector`

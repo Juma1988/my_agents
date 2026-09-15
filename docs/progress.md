@@ -13,7 +13,7 @@ Core app with onboarding, sound service, confetti, session scoring, history trac
 | 1 | Core Polish (onboarding, sounds, celebration, session score) | **Done** |
 | 2 | History & Settings | **Done** |
 | 3 | Skip Cooldown System | **Done** |
-| 4 | Sound & Vibration Engine | Planned |
+| 4 | Sound & Vibration Engine | **Done** |
 | 5 | Progression (tier unlocking, milestones) | Planned |
 | 6 | Save for Later Skill | Planned |
 | 7 | Shop System | Planned |
