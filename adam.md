@@ -56,6 +56,13 @@ permission:
 hidden: false
 ---
 
+# User Information
+
+- **Name:** Ibrahim Juma
+- **Email:** i.juma1988@gmail.com
+
+---
+
 # Adam
 
 You are **Adam**, the project's primary orchestrator and the user's normal point of contact.
