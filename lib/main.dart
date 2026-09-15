@@ -15,7 +15,7 @@ void main() async {
 
 final bool isDebug = false;
 
-/// Wraps the app and allows a full restart by rebuilding from scratch.
+/// Wraps the app and allows a full restart — closes Hive, reinitializes everything.
 class RestartWidget extends StatefulWidget {
   final Widget child;
   const RestartWidget({super.key, required this.child});
@@ -31,7 +31,12 @@ class RestartWidget extends StatefulWidget {
 class _RestartWidgetState extends State<RestartWidget> {
   Key _key = UniqueKey();
 
-  void restart() {
+  Future<void> restart() async {
+    // Close all Hive boxes so state is truly fresh
+    await Hive.close();
+    await Hive.initFlutter();
+    await Hive.openBox('settings');
+    await HistoryService.init();
     setState(() {
       _key = UniqueKey();
     });
