@@ -120,10 +120,9 @@ class CategoryCardWheelState extends State<CategoryCardWheel> {
     if (MediaQuery.disableAnimationsOf(context)) {
       _controller.jumpToItem(landingVirtual);
       _selectedIndex.value = landingVirtual;
-      final actualReal = _realIndex(_controller.selectedItem);
-      _pulseRealIndex = actualReal;
+      _pulseRealIndex = targetReal;
       _pulseTick.value++;
-      return pool[actualReal];
+      return pool[targetReal];
     }
 
     _rolling = true;
@@ -163,14 +162,14 @@ class CategoryCardWheelState extends State<CategoryCardWheel> {
       _rolling = false;
       if (!mounted) return;
       SoundService.wheelLand();
-      // Use the ACTUAL final position from the controller, not the pre-computed target
-      final actualReal = _realIndex(_controller.selectedItem);
-      _pulseRealIndex = actualReal;
-      _pulseTick.value++;
     });
 
-    // Read the actual final position — the animation may have settled on a different card
-    final finalReal = _realIndex(_controller.selectedItem);
+    // Force-jump to exact target to guarantee the visual matches the returned task
+    _controller.jumpToItem(landingVirtual);
+    _selectedIndex.value = landingVirtual;
+    final finalReal = _realIndex(landingVirtual);
+    _pulseRealIndex = finalReal;
+    _pulseTick.value++;
     return pool[finalReal];
   }
 
