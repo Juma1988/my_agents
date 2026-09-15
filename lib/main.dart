@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import 'data/history_service.dart';
 import 'screens/spin_screen.dart';
 import 'theme/app_colors.dart';
 
@@ -8,6 +9,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
   await Hive.openBox('settings');
+  await HistoryService.init();
   runApp(const MyApp());
 }
 

@@ -6,9 +6,9 @@ import 'package:risk_roulette/main.dart';
 void main() {
   setUpAll(() async {
     TestWidgetsFlutterBinding.ensureInitialized();
-    // Use Hive directly (not initFlutter) to avoid path_provider in tests
     Hive.init('test_hive_dir');
     await Hive.openBox('settings');
+    await Hive.openBox('history');
   });
 
   tearDownAll(() async {

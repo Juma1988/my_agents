@@ -3,6 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../models/challenge_category.dart';
 import '../data/category_colors.dart';
 import '../data/sound_service.dart';
+import '../screens/history_screen.dart';
+import '../screens/settings_screen.dart';
 import '../theme/app_colors.dart';
 import 'custom_snackbar.dart';
 
@@ -270,6 +272,38 @@ class AppDrawer extends StatelessWidget {
                   ),
 
                   const SizedBox(height: 24),
+
+                  // ── Bottom buttons ──
+                  const Divider(color: Colors.white12, height: 1),
+                  const SizedBox(height: 12),
+                  _buildDrawerButton(
+                    context,
+                    icon: Icons.history,
+                    label: 'History',
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const HistoryScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 6),
+                  _buildDrawerButton(
+                    context,
+                    icon: Icons.settings,
+                    label: 'Settings',
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const SettingsScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 16),
                 ],
               ),
             ),
@@ -598,6 +632,51 @@ class AppDrawer extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDrawerButton(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: GestureDetector(
+        onTap: () {
+          SoundService.tap();
+          onTap();
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+          ),
+          child: Row(
+            children: [
+              Icon(icon, color: Colors.white54, size: 20),
+              const SizedBox(width: 12),
+              Text(
+                label,
+                style: GoogleFonts.inter(
+                  color: Colors.white70,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const Spacer(),
+              Icon(
+                Icons.chevron_right,
+                color: Colors.white24,
+                size: 18,
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -7,6 +7,7 @@ import '../models/challenge_segment.dart';
 import '../data/task_loader.dart';
 import '../data/category_colors.dart';
 import '../data/sound_service.dart';
+import '../data/history_service.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/category_card_wheel.dart';
 import '../widgets/confetti_overlay.dart';
@@ -282,6 +283,19 @@ class _SpinScreenState extends State<SpinScreen> {
                 _savePlayerData();
                 _showFloatingScore(task.points, isAccept: true);
                 _togglePlayer();
+                // Record history
+                HistoryService.record(
+                  taskId: task.id,
+                  categoryId: category.id,
+                  categoryName: category.name,
+                  categoryIcon: category.icon,
+                  tier: _selectedTiers.first,
+                  taskText: task.text,
+                  points: task.points,
+                  accepted: true,
+                  player: _currentPlayer == 1 ? 2 : 1, // toggled already
+                  playerName: _nicknames[_currentPlayer == 1 ? 2 : 1]!,
+                );
                 // Confetti celebration
                 if (mounted) ConfettiOverlay.show(context);
               }
@@ -295,7 +309,22 @@ class _SpinScreenState extends State<SpinScreen> {
             });
             _savePlayerData();
             _showFloatingScore(task.points, isAccept: true);
+            // Record history (before toggle)
+            final completedBy = _currentPlayer;
+            final completedByName = _nicknames[_currentPlayer]!;
             _togglePlayer();
+            HistoryService.record(
+              taskId: task.id,
+              categoryId: category.id,
+              categoryName: category.name,
+              categoryIcon: category.icon,
+              tier: _selectedTiers.first,
+              taskText: task.text,
+              points: task.points,
+              accepted: true,
+              player: completedBy,
+              playerName: completedByName,
+            );
             // Confetti celebration
             if (mounted) ConfettiOverlay.show(context);
           }
@@ -303,10 +332,25 @@ class _SpinScreenState extends State<SpinScreen> {
         onSkip: () {
           SoundService.skip();
           // Penalty = task.points, same player rolls again (no toggle)
+          final skippedBy = _currentPlayer;
+          final skippedByName = _nicknames[_currentPlayer]!;
           setState(() {
             _scores[_currentPlayer] = (_scores[_currentPlayer] ?? 0) - task.points;
           });
           _savePlayerData();
+          // Record history
+          HistoryService.record(
+            taskId: task.id,
+            categoryId: category.id,
+            categoryName: category.name,
+            categoryIcon: category.icon,
+            tier: _selectedTiers.first,
+            taskText: task.text,
+            points: task.points,
+            accepted: false,
+            player: skippedBy,
+            playerName: skippedByName,
+          );
           // Show skip animation
           _showFloatingScore(task.points, isAccept: false);
           Navigator.of(context).pop();
