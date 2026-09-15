@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 import '../theme/app_colors.dart';
+import '../widgets/dev_overlay.dart';
 
 /// 3-slide onboarding shown on first launch.
 /// Persists completion in Hive so it never shows again.
@@ -25,6 +26,12 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    DevOverlay.currentFilePath = 'lib/screens/onboarding_screen.dart';
+  }
 
   static const _slides = [
     _SlideData(

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/challenge_category.dart';
@@ -13,9 +12,8 @@ import '../data/progression_service.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/category_card_wheel.dart';
 import '../widgets/confetti_overlay.dart';
-import '../widgets/custom_snackbar.dart';
+import '../widgets/dev_overlay.dart';
 import '../theme/app_colors.dart';
-import '../main.dart';
 
 import '../widgets/spin_button.dart';
 import '../widgets/wheel_pointer.dart';
@@ -33,7 +31,6 @@ class _SpinScreenState extends State<SpinScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey<CategoryCardWheelState> _wheelKey = GlobalKey();
   bool _isSpinning = false;
-  String _currentCenterTaskText = '';
   bool _isLoading = true;
   bool _hasError = false;
   String? _errorMessage;
@@ -65,6 +62,7 @@ class _SpinScreenState extends State<SpinScreen> {
   @override
   void initState() {
     super.initState();
+    DevOverlay.currentFilePath = 'lib/screens/spin_screen.dart';
     _settingsBox = Hive.box('settings');
     _loadCategories();
     _checkOnboarding();
@@ -503,9 +501,7 @@ class _SpinScreenState extends State<SpinScreen> {
                 categories: _categories,
                 selectedCategoryIds: _selectedCategoryIds,
                 selectedTiers: _selectedTiers,
-                onCenterChanged: (text) {
-                  _currentCenterTaskText = text;
-                },
+                onCenterChanged: (text) {},
               ),
               // Pointer at bottom
               Positioned(
@@ -513,58 +509,6 @@ class _SpinScreenState extends State<SpinScreen> {
                 child: Transform.rotate(
                   angle: 0,
                   child: const WheelPointer(),
-                ),
-              ),
-              // Top-left buttons: restart + copy
-              Positioned(
-                top: 8,
-                left: 8,
-                child: Row(
-                  children: [
-                    // Restart button (long-press)
-                    GestureDetector(
-                      onLongPress: () {
-                        SoundService.tap();
-                        RestartWidget.restartApp(context);
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.05),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          Icons.refresh,
-                          color: Colors.white.withValues(alpha: 0.15),
-                          size: 16,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    // Copy task button
-                    GestureDetector(
-                      onTap: () {
-                        if (_currentCenterTaskText.isNotEmpty) {
-                          Clipboard.setData(
-                              ClipboardData(text: _currentCenterTaskText));
-                          SoundService.tap();
-                          AppSnackBar.show(context, 'Task copied to clipboard');
-                        }
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.05),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(
-                          Icons.copy,
-                          color: Colors.white.withValues(alpha: 0.15),
-                          size: 16,
-                        ),
-                      ),
-                    ),
-                  ],
                 ),
               ),
             ],

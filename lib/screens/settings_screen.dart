@@ -6,6 +6,7 @@ import '../data/sound_service.dart';
 import '../data/progression_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/custom_snackbar.dart';
+import '../widgets/dev_overlay.dart';
 
 /// Settings page accessible from the drawer.
 class SettingsScreen extends StatefulWidget {
@@ -44,6 +45,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
+    DevOverlay.currentFilePath = 'lib/screens/settings_screen.dart';
     _box = Hive.box('settings');
     _hideCompleted = _box.get('hide_completed', defaultValue: 'disable');
     _hapticEnabled = _box.get('haptic_enabled', defaultValue: true);

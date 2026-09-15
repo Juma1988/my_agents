@@ -4,6 +4,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'data/history_service.dart';
 import 'screens/spin_screen.dart';
 import 'theme/app_colors.dart';
+import 'widgets/dev_overlay.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,7 +14,7 @@ void main() async {
   runApp(const RestartWidget(child: MyApp()));
 }
 
-final bool isDebug = false;
+final bool isDebug = true; // Set to false for production builds
 
 /// Wraps the app and allows a full restart — closes Hive, reinitializes everything.
 class RestartWidget extends StatefulWidget {
@@ -57,7 +58,7 @@ class MyApp extends StatelessWidget {
       title: 'The Spin',
       debugShowCheckedModeBanner: isDebug,
       theme: ThemeData.dark().copyWith(scaffoldBackgroundColor: AppColors.background),
-      home: const SpinScreen(),
+      home: const DevOverlay(child: SpinScreen()),
     );
   }
 }

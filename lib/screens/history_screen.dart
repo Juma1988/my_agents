@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../data/history_service.dart';
 import '../data/category_colors.dart';
 import '../theme/app_colors.dart';
+import '../widgets/dev_overlay.dart';
 
 /// Screen showing task history with filters and favorites.
 class HistoryScreen extends StatefulWidget {
@@ -20,6 +21,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   void initState() {
     super.initState();
+    DevOverlay.currentFilePath = 'lib/screens/history_screen.dart';
     _entries = HistoryService.getFiltered(
       filter: _activeFilter == 'all' ? null : _activeFilter,
       categoryId: _activeCategoryId,

@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../data/sound_service.dart';
 import '../theme/app_colors.dart';
+import '../widgets/dev_overlay.dart';
 
 /// Result returned when the timer screen is popped.
 class TimerResult {
@@ -50,6 +51,7 @@ class _TimerScreenState extends State<TimerScreen>
   @override
   void initState() {
     super.initState();
+    DevOverlay.currentFilePath = 'lib/screens/timer_screen.dart';
     _remainingSeconds = widget.timerSeconds;
 
     // Pulse animation for the "Time's Up!" overlay
