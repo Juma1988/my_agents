@@ -8,6 +8,7 @@ import '../data/task_loader.dart';
 import '../data/category_colors.dart';
 import '../data/sound_service.dart';
 import '../data/history_service.dart';
+import '../data/progression_service.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/category_card_wheel.dart';
 import '../widgets/confetti_overlay.dart';
@@ -114,9 +115,9 @@ class _SpinScreenState extends State<SpinScreen> {
     if (_selectedTiers.isEmpty) {
       _selectedTiers = ['soft'];
     }
-    // Validate all tiers exist
+    // Validate all tiers exist and are unlocked
     _selectedTiers = _selectedTiers
-        .where((t) => ['soft', 'kink', 'entertainment'].contains(t))
+        .where((t) => ['soft', 'kink', 'entertainment'].contains(t) && ProgressionService.isTierUnlocked(t))
         .toList();
     if (_selectedTiers.isEmpty) {
       _selectedTiers = ['soft'];
@@ -315,6 +316,7 @@ class _SpinScreenState extends State<SpinScreen> {
                   player: _currentPlayer == 1 ? 2 : 1, // toggled already
                   playerName: _nicknames[_currentPlayer == 1 ? 2 : 1]!,
                 );
+                ProgressionService.recordCompletion();
                 // Confetti celebration
                 if (mounted) {
                   SoundService.celebration();
@@ -347,6 +349,7 @@ class _SpinScreenState extends State<SpinScreen> {
               player: completedBy,
               playerName: completedByName,
             );
+            ProgressionService.recordCompletion();
             // Confetti celebration
             if (mounted) {
               SoundService.celebration();
