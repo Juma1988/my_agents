@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/challenge_category.dart';
 import '../data/category_colors.dart';
+import '../data/sound_service.dart';
 import '../theme/app_colors.dart';
 import 'custom_snackbar.dart';
 
@@ -168,7 +168,7 @@ class AppDrawer extends StatelessWidget {
                 final isSelected = emoji == current;
                 return GestureDetector(
                   onTap: () {
-                    HapticFeedback.selectionClick();
+                    SoundService.select();
                     onChanged(emoji);
                     Navigator.of(ctx).pop();
                   },
@@ -353,7 +353,7 @@ class AppDrawer extends StatelessWidget {
               toggled: isSelected,
               child: GestureDetector(
                 onTap: () {
-                  HapticFeedback.selectionClick();
+                  SoundService.select();
                   _toggleCategory(cat.id, context);
                 },
                 child: AnimatedContainer(
@@ -432,7 +432,7 @@ class AppDrawer extends StatelessWidget {
       toggled: selected,
       child: GestureDetector(
         onTap: () {
-          HapticFeedback.selectionClick();
+          SoundService.select();
           final newTiers = List<String>.from(selectedTiers);
           if (newTiers.contains(tier)) {
             // Don't allow deselecting the last tier
@@ -511,7 +511,7 @@ class AppDrawer extends StatelessWidget {
             // Avatar (tap to change)
             GestureDetector(
               onTap: () {
-                HapticFeedback.selectionClick();
+                SoundService.select();
                 _showAvatarPicker(context, '$label Avatar', avatar, onAvatarChanged);
               },
               child: Container(
@@ -546,7 +546,7 @@ class AppDrawer extends StatelessWidget {
                   const SizedBox(height: 2),
                   GestureDetector(
                     onTap: () {
-                      HapticFeedback.selectionClick();
+                      SoundService.select();
                       _showNicknameDialog(
                           context, '$label Nickname', nickname, onNicknameChanged);
                     },
@@ -578,7 +578,7 @@ class AppDrawer extends StatelessWidget {
             // Change avatar button
             GestureDetector(
               onTap: () {
-                HapticFeedback.selectionClick();
+                SoundService.select();
                 _showAvatarPicker(context, '$label Avatar', avatar, onAvatarChanged);
               },
               child: Container(

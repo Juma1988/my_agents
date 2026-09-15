@@ -2,12 +2,12 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../models/challenge_category.dart';
 import '../models/challenge_segment.dart';
 import '../data/category_colors.dart';
+import '../data/sound_service.dart';
 import '../theme/app_colors.dart';
 
 /// A flat item combining a task with its parent category for the wheel.
@@ -135,7 +135,7 @@ class CategoryCardWheelState extends State<CategoryCardWheel> {
       final currentReal = _realIndex(currentCenter);
       if (currentReal != _lastTickedIndex && _lastTickedIndex != -1) {
         _lastTickedIndex = currentReal;
-        HapticFeedback.selectionClick();
+        SoundService.wheelTick();
       }
       _lastTickedIndex = currentReal;
     }
@@ -153,7 +153,7 @@ class CategoryCardWheelState extends State<CategoryCardWheel> {
       _controller.removeListener(tickListener);
       _rolling = false;
       if (!mounted) return;
-      HapticFeedback.mediumImpact();
+      SoundService.wheelLand();
       _pulseRealIndex = targetReal;
       _pulseTick.value++;
     });
@@ -219,7 +219,7 @@ class CategoryCardWheelState extends State<CategoryCardWheel> {
         onSelectedItemChanged: (virtualIndex) {
           _selectedIndex.value = virtualIndex;
           widget.onCenterChanged?.call(_realIndex(virtualIndex));
-          HapticFeedback.selectionClick();
+          SoundService.wheelTick();
         },
         childDelegate: ListWheelChildBuilderDelegate(
           childCount: _virtualChildCount,

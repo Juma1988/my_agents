@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../data/sound_service.dart';
 import '../theme/app_colors.dart';
 
 /// Result returned when the timer screen is popped.
@@ -44,7 +44,6 @@ class _TimerScreenState extends State<TimerScreen>
   late int _remainingSeconds;
   Timer? _timer;
   bool _isExpired = false;
-  bool _alarmPlayed = false;
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
 
@@ -81,7 +80,7 @@ class _TimerScreenState extends State<TimerScreen>
 
         // Vibrate at 30s and 10s markers
         if (_remainingSeconds == 30 || _remainingSeconds == 10) {
-          HapticFeedback.mediumImpact();
+          SoundService.timerWarning();
         }
       } else {
         timer.cancel();
@@ -95,39 +94,11 @@ class _TimerScreenState extends State<TimerScreen>
 
   Future<void> _onTimerExpired() async {
     // Play alarm sound with fallback
-    await _playAlarm();
+    await SoundService.timerAlarm();
     // Vibrate for 3 seconds
-    _startVibrationLoop();
+    SoundService.timerVibrateLoop();
     // Start pulse animation
     _pulseController.repeat(reverse: true);
-  }
-
-  Future<void> _playAlarm() async {
-    if (_alarmPlayed) return;
-    _alarmPlayed = true;
-
-    try {
-      // Use system sound as reliable fallback
-      await SystemSound.play(SystemSoundType.alert);
-    } catch (_) {
-      // If system sound fails, try haptic as last resort
-      try {
-        await HapticFeedback.vibrate();
-      } catch (_) {}
-    }
-  }
-
-  void _startVibrationLoop() {
-    // Vibrate for ~3 seconds using heavy impact
-    int count = 0;
-    Timer.periodic(const Duration(milliseconds: 500), (timer) {
-      count++;
-      if (count >= 6 || !_isExpired) {
-        timer.cancel();
-        return;
-      }
-      HapticFeedback.heavyImpact();
-    });
   }
 
   /// Format seconds into M:SS display.

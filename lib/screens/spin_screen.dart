@@ -1,18 +1,20 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/challenge_category.dart';
 import '../models/challenge_segment.dart';
 import '../data/task_loader.dart';
 import '../data/category_colors.dart';
+import '../data/sound_service.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/category_card_wheel.dart';
+import '../widgets/confetti_overlay.dart';
 import '../theme/app_colors.dart';
 
 import '../widgets/spin_button.dart';
 import '../widgets/wheel_pointer.dart';
+import 'onboarding_screen.dart';
 import 'timer_screen.dart';
 
 class SpinScreen extends StatefulWidget {
@@ -39,6 +41,9 @@ class _SpinScreenState extends State<SpinScreen> {
   Map<int, String> _nicknames = {1: 'Player 1', 2: 'Player 2'};
   Map<int, String> _avatars = {1: '😈', 2: '👿'};
 
+  // Session tracking (resets on full app close)
+  late Map<int, int> _sessionStartScores;
+
   // State
   List<ChallengeCategory> _categories = [];
   List<String> _selectedCategoryIds = [];
@@ -52,6 +57,19 @@ class _SpinScreenState extends State<SpinScreen> {
     super.initState();
     _settingsBox = Hive.box('settings');
     _loadCategories();
+    _checkOnboarding();
+  }
+
+  void _checkOnboarding() async {
+    if (await OnboardingScreen.shouldShow()) {
+      if (!mounted) return;
+      await Navigator.of(context).push(
+        MaterialPageRoute(
+          fullscreenDialog: true,
+          builder: (_) => const OnboardingScreen(),
+        ),
+      );
+    }
   }
 
   Future<void> _loadCategories() async {
@@ -117,6 +135,8 @@ class _SpinScreenState extends State<SpinScreen> {
     setState(() {
       _categories = categories;
       _isLoading = false;
+      // Snapshot scores at session start for delta calculation
+      _sessionStartScores = Map<int, int>.from(_scores);
     });
   }
 
@@ -194,7 +214,7 @@ class _SpinScreenState extends State<SpinScreen> {
     if (activeCategories.isEmpty) return;
 
     if (_hapticFeedback) {
-      HapticFeedback.lightImpact();
+      SoundService.tap();
     }
     setState(() {
       _isSpinning = true;
@@ -212,6 +232,7 @@ class _SpinScreenState extends State<SpinScreen> {
       setState(() {
         _isSpinning = false;
       });
+      SoundService.wheelLand();
 
       // Small delay so the final card settles before the sheet pops up
       Future.delayed(const Duration(milliseconds: 400), () {
@@ -232,9 +253,7 @@ class _SpinScreenState extends State<SpinScreen> {
         category: category,
         task: task,
         onAccept: () {
-          if (_hapticFeedback) {
-            HapticFeedback.mediumImpact();
-          }
+          SoundService.accept();
           // Close the bottom sheet first
           Navigator.of(context).pop();
 
@@ -263,6 +282,8 @@ class _SpinScreenState extends State<SpinScreen> {
                 _savePlayerData();
                 _showFloatingScore(task.points, isAccept: true);
                 _togglePlayer();
+                // Confetti celebration
+                if (mounted) ConfettiOverlay.show(context);
               }
               // Cancel: no points, no toggle
             });
@@ -275,12 +296,12 @@ class _SpinScreenState extends State<SpinScreen> {
             _savePlayerData();
             _showFloatingScore(task.points, isAccept: true);
             _togglePlayer();
+            // Confetti celebration
+            if (mounted) ConfettiOverlay.show(context);
           }
         },
         onSkip: () {
-          if (_hapticFeedback) {
-            HapticFeedback.lightImpact();
-          }
+          SoundService.skip();
           // Penalty = task.points, same player rolls again (no toggle)
           setState(() {
             _scores[_currentPlayer] = (_scores[_currentPlayer] ?? 0) - task.points;
@@ -492,9 +513,7 @@ class _SpinScreenState extends State<SpinScreen> {
                 child: GestureDetector(
                   onTap: () {
                     if (_currentPlayer != 1) {
-                      if (_hapticFeedback) {
-                        HapticFeedback.selectionClick();
-                      }
+                      SoundService.select();
                       setState(() {
                         _currentPlayer = 1;
                       });
@@ -531,9 +550,7 @@ class _SpinScreenState extends State<SpinScreen> {
                 child: GestureDetector(
                   onTap: () {
                     if (_currentPlayer != 2) {
-                      if (_hapticFeedback) {
-                        HapticFeedback.selectionClick();
-                      }
+                      SoundService.select();
                       setState(() {
                         _currentPlayer = 2;
                       });
@@ -578,6 +595,8 @@ class _SpinScreenState extends State<SpinScreen> {
     final avatar = _avatars[player] ?? (player == 1 ? '😈' : '👿');
     final nickname = _nicknames[player] ?? 'Player $player';
     final score = _scores[player] ?? 0;
+    final sessionStart = _sessionStartScores[player] ?? 0;
+    final delta = score - sessionStart;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 250),
@@ -617,15 +636,33 @@ class _SpinScreenState extends State<SpinScreen> {
             ],
           ),
           const SizedBox(height: 4),
-          Text(
-            'Score: $score',
-            style: GoogleFonts.inter(
-              color: isCurrent
-                  ? AppColors.accent
-                  : Colors.white.withValues(alpha: 0.4),
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '$score',
+                style: GoogleFonts.inter(
+                  color: isCurrent
+                      ? AppColors.accent
+                      : Colors.white.withValues(alpha: 0.4),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              if (delta != 0) ...[
+                const SizedBox(width: 4),
+                Text(
+                  '(${delta > 0 ? '+' : ''}$delta)',
+                  style: GoogleFonts.inter(
+                    color: delta > 0
+                        ? Colors.greenAccent
+                        : Colors.redAccent,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ],
           ),
         ],
       ),
