@@ -22,6 +22,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   String _hideCompleted = 'disable'; // always_ask, keep_favorite, enable, disable
   bool _hapticEnabled = true;
   bool _soundEnabled = true;
+  bool _hideCompletedExpanded = true;
 
   // Player profiles
   String _player1Nickname = 'Player 1';
@@ -117,9 +118,47 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 24),
 
           // ── Completed Tasks Section ──
-          _buildSectionLabel('COMPLETED TASKS'),
+          GestureDetector(
+            onTap: () {
+              SoundService.tap();
+              setState(() => _hideCompletedExpanded = !_hideCompletedExpanded);
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                children: [
+                  Text(
+                    'COMPLETED TASKS',
+                    style: GoogleFonts.inter(
+                      color: Colors.white54,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 2,
+                    ),
+                  ),
+                  const Spacer(),
+                  AnimatedRotation(
+                    turns: _hideCompletedExpanded ? 0.5 : 0,
+                    duration: const Duration(milliseconds: 200),
+                    child: Icon(
+                      Icons.expand_less,
+                      color: Colors.white38,
+                      size: 18,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
           const SizedBox(height: 8),
-          _buildHideCompletedOption(),
+          AnimatedCrossFade(
+            firstChild: _buildHideCompletedOption(),
+            secondChild: const SizedBox.shrink(),
+            crossFadeState: _hideCompletedExpanded
+                ? CrossFadeState.showFirst
+                : CrossFadeState.showSecond,
+            duration: const Duration(milliseconds: 200),
+          ),
 
           const SizedBox(height: 24),
           const Divider(color: Colors.white12, height: 1),
