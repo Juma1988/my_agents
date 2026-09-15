@@ -41,7 +41,7 @@ class CategoryCardWheel extends StatefulWidget {
   final List<String> selectedCategoryIds;
   final List<String> selectedTiers;
   final int initialIndex;
-  final ValueChanged<int>? onCenterChanged;
+  final ValueChanged<String>? onCenterChanged;
 
   @override
   State<CategoryCardWheel> createState() => CategoryCardWheelState();
@@ -231,7 +231,11 @@ class CategoryCardWheelState extends State<CategoryCardWheel> {
         clipBehavior: Clip.none,
         onSelectedItemChanged: (virtualIndex) {
           _selectedIndex.value = virtualIndex;
-          widget.onCenterChanged?.call(_realIndex(virtualIndex));
+          final pool = _taskPool;
+          if (pool.isNotEmpty) {
+            final realIdx = _realIndex(virtualIndex);
+            widget.onCenterChanged?.call(pool[realIdx].task.text);
+          }
           SoundService.wheelTick();
         },
         childDelegate: ListWheelChildBuilderDelegate(
