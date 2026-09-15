@@ -4,6 +4,7 @@ import 'package:hive/hive.dart';
 import '../data/history_service.dart';
 import '../data/sound_service.dart';
 import '../data/progression_service.dart';
+import '../data/achievement_service.dart';
 import '../theme/app_colors.dart';
 import '../widgets/custom_snackbar.dart';
 import '../widgets/dev_overlay.dart';
@@ -393,7 +394,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _buildProgressionSummary() {
     final total = ProgressionService.totalCompleted;
     final progress = ProgressionService.nextTierUnlock;
-    final earned = ProgressionService.earnedMilestones;
+    final p1Achievements = AchievementService.unlockedCount(1);
+    final p2Achievements = AchievementService.unlockedCount(2);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -413,7 +415,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '$total tasks completed · ${earned.length} milestones',
+                    '$total tasks · ${p1Achievements + p2Achievements} achievements',
                     style: GoogleFonts.inter(
                       color: Colors.white70,
                       fontSize: 13,

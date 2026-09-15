@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../theme/app_colors.dart';
@@ -20,30 +19,6 @@ class DevOverlay extends StatefulWidget {
 }
 
 class _DevOverlayState extends State<DevOverlay> {
-  int _clickCount = 0;
-  Timer? _clickTimer;
-  bool _actionsVisible = false;
-
-  void _onTap(BuildContext context) {
-    _clickCount++;
-    _clickTimer?.cancel();
-    _clickTimer = Timer(const Duration(milliseconds: 500), () {
-      _clickCount = 0;
-    });
-
-    if (_clickCount >= 3) {
-      _clickCount = 0;
-      _clickTimer?.cancel();
-      setState(() => _actionsVisible = !_actionsVisible);
-    }
-  }
-
-  @override
-  void dispose() {
-    _clickTimer?.cancel();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     if (!isDebug) return widget.child;
@@ -51,54 +26,39 @@ class _DevOverlayState extends State<DevOverlay> {
     return Stack(
       children: [
         widget.child,
-        // Dev buttons (top-left)
+        // Dev buttons (top-left) — always visible
         Positioned(
           top: MediaQuery.of(context).padding.top + 4,
           left: 8,
-          child: GestureDetector(
-            onTap: () => _onTap(context),
-            child: AnimatedOpacity(
-              opacity: _actionsVisible ? 1.0 : 0.08,
-              duration: const Duration(milliseconds: 200),
-              child: AnimatedScale(
-                scale: _actionsVisible ? 1.0 : 0.8,
-                duration: const Duration(milliseconds: 200),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (_actionsVisible) ...[
-                      // Restart button
-                      GestureDetector(
-                        onLongPress: () {
-                          SoundService.tap();
-                          RestartWidget.restartApp(context);
-                        },
-                        child: _buildDevButton(
-                          icon: Icons.refresh,
-                          tooltip: 'Long-press to restart',
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      // Copy file path button
-                      GestureDetector(
-                        onTap: () {
-                          Clipboard.setData(
-                              ClipboardData(text: DevOverlay.currentFilePath));
-                          SoundService.tap();
-                          AppSnackBar.show(context, DevOverlay.currentFilePath);
-                        },
-                        child: _buildDevButton(
-                          icon: Icons.copy,
-                          tooltip: 'Tap to copy file path',
-                        ),
-                      ),
-                    ] else ...[
-                      _buildDevButton(icon: Icons.code, tooltip: 'Triple-tap'),
-                    ],
-                  ],
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Restart button
+              GestureDetector(
+                onTap: () {
+                  SoundService.tap();
+                  RestartWidget.restartApp(context);
+                },
+                child: _buildDevButton(
+                  icon: Icons.refresh,
+                  tooltip: 'Tap to restart',
                 ),
               ),
-            ),
+              const SizedBox(width: 6),
+              // Copy file path button
+              GestureDetector(
+                onTap: () {
+                  Clipboard.setData(
+                      ClipboardData(text: DevOverlay.currentFilePath));
+                  SoundService.tap();
+                  AppSnackBar.show(context, DevOverlay.currentFilePath);
+                },
+                child: _buildDevButton(
+                  icon: Icons.copy,
+                  tooltip: 'Tap to copy file path',
+                ),
+              ),
+            ],
           ),
         ),
       ],
@@ -111,17 +71,13 @@ class _DevOverlayState extends State<DevOverlay> {
       child: Container(
         padding: const EdgeInsets.all(6),
         decoration: BoxDecoration(
-          color: _actionsVisible
-              ? AppColors.accent.withValues(alpha: 0.3)
-              : Colors.white.withValues(alpha: 0.05),
+          color: AppColors.accent.withValues(alpha: 0.2),
           borderRadius: BorderRadius.circular(8),
-          border: _actionsVisible
-              ? Border.all(color: AppColors.accent.withValues(alpha: 0.5))
-              : null,
+          border: Border.all(color: AppColors.accent.withValues(alpha: 0.4)),
         ),
         child: Icon(
           icon,
-          color: _actionsVisible ? Colors.white : Colors.white24,
+          color: Colors.white70,
           size: 16,
         ),
       ),

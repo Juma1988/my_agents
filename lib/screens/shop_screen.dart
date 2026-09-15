@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../data/shop_service.dart';
 import '../data/sound_service.dart';
+import '../data/achievement_service.dart';
+import '../widgets/achievement_unlock_popup.dart';
 import '../theme/app_colors.dart';
 import '../widgets/custom_snackbar.dart';
 import '../widgets/dev_overlay.dart';
@@ -69,6 +71,13 @@ class _ShopScreenState extends State<ShopScreen> {
     if (success) {
       setState(() {});
       AppSnackBar.show(context, 'Purchased ${item.name}!');
+      // Check achievements
+      final newAchievements = AchievementService.recordPurchase(widget.player);
+      for (final a in newAchievements) {
+        if (mounted) {
+          AchievementUnlockPopup.show(context, a);
+        }
+      }
     }
   }
 

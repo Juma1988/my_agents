@@ -4,6 +4,7 @@ import '../models/challenge_category.dart';
 import '../data/category_colors.dart';
 import '../data/sound_service.dart';
 import '../data/progression_service.dart';
+import '../data/achievement_service.dart';
 import '../screens/history_screen.dart';
 import '../screens/settings_screen.dart';
 import '../screens/shop_screen.dart';
@@ -448,48 +449,55 @@ class AppDrawer extends StatelessWidget {
             ),
           ],
 
-          // Milestones
+          // Achievements
           const SizedBox(height: 12),
-          _buildMilestones(),
+          _buildAchievements(),
         ],
       ),
     );
   }
 
-  Widget _buildMilestones() {
-    final earned = ProgressionService.earnedMilestones;
-    final next = ProgressionService.nextMilestone;
+  Widget _buildAchievements() {
+    final player1Unlocked = AchievementService.getUnlocked(1);
+    final player2Unlocked = AchievementService.getUnlocked(2);
+    final totalUnlocked = player1Unlocked.length + player2Unlocked.length;
+    final totalAchievements = AchievementService.achievements.length;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'MILESTONES',
-          style: GoogleFonts.inter(
-            color: Colors.white38,
-            fontSize: 10,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 1.2,
-          ),
+        Row(
+          children: [
+            Text(
+              'ACHIEVEMENTS',
+              style: GoogleFonts.inter(
+                color: Colors.white38,
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 1.2,
+              ),
+            ),
+            const Spacer(),
+            Text(
+              '$totalUnlocked / ${totalAchievements * 2}',
+              style: GoogleFonts.inter(
+                color: Colors.white38,
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 8),
         Wrap(
-          spacing: 8,
+          spacing: 6,
           runSpacing: 6,
           children: [
-            for (final m in ProgressionService.milestones)
-              _buildMilestoneBadge(m, isEarned: earned.contains(m)),
-            if (next != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: Text(
-                  'Next: ${next.icon} ${next.name} at ${next.threshold} tasks',
-                  style: GoogleFonts.inter(
-                    color: Colors.white24,
-                    fontSize: 10,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
+            for (final a in AchievementService.achievements)
+              _buildAchievementBadge(
+                a,
+                isEarned: player1Unlocked.contains(a.id) ||
+                    player2Unlocked.contains(a.id),
               ),
           ],
         ),
@@ -497,37 +505,40 @@ class AppDrawer extends StatelessWidget {
     );
   }
 
-  Widget _buildMilestoneBadge(Milestone milestone, {required bool isEarned}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: isEarned
-            ? AppColors.accent.withValues(alpha: 0.15)
-            : Colors.white.withValues(alpha: 0.03),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
+  Widget _buildAchievementBadge(Achievement a, {required bool isEarned}) {
+    return Tooltip(
+      message: '${a.name}\n${a.description}',
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
           color: isEarned
-              ? AppColors.accent.withValues(alpha: 0.3)
-              : Colors.white.withValues(alpha: 0.06),
+              ? const Color(0xFFFFD700).withValues(alpha: 0.12)
+              : Colors.white.withValues(alpha: 0.03),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isEarned
+                ? const Color(0xFFFFD700).withValues(alpha: 0.4)
+                : Colors.white.withValues(alpha: 0.06),
+          ),
         ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            milestone.icon,
-            style: TextStyle(fontSize: 12, color: isEarned ? null : Colors.white24),
-          ),
-          const SizedBox(width: 4),
-          Text(
-            milestone.name,
-            style: GoogleFonts.inter(
-              color: isEarned ? Colors.white70 : Colors.white24,
-              fontSize: 10,
-              fontWeight: FontWeight.w500,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              a.icon,
+              style: TextStyle(fontSize: 12, color: isEarned ? null : Colors.white24),
             ),
-          ),
-        ],
+            const SizedBox(width: 4),
+            Text(
+              a.name,
+              style: GoogleFonts.inter(
+                color: isEarned ? Colors.white70 : Colors.white24,
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

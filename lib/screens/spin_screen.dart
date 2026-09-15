@@ -10,9 +10,11 @@ import '../data/sound_service.dart';
 import '../data/history_service.dart';
 import '../data/progression_service.dart';
 import '../data/shop_service.dart';
+import '../data/achievement_service.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/category_card_wheel.dart';
 import '../widgets/confetti_overlay.dart';
+import '../widgets/achievement_unlock_popup.dart';
 import '../widgets/dev_overlay.dart';
 import '../theme/app_colors.dart';
 
@@ -244,6 +246,13 @@ class _SpinScreenState extends State<SpinScreen> {
       _saveCooldowns[player] = _saveCooldownMax;
     });
     _savePlayerData();
+    // Check achievements
+    final newAchievements = AchievementService.recordBookmark(player);
+    for (final a in newAchievements) {
+      if (mounted) {
+        AchievementUnlockPopup.show(context, a);
+      }
+    }
   }
 
   /// Check if player has saved tasks pending
@@ -434,6 +443,12 @@ class _SpinScreenState extends State<SpinScreen> {
           final effectivePoints = hasDoublePoints ? task.points * 2 : task.points;
           if (hasDoublePoints) {
             ShopService.consumeItem(_currentPlayer, 'double_points');
+            final dpAchievements = AchievementService.recordDoublePointsUse(_currentPlayer);
+            for (final a in dpAchievements) {
+              if (mounted) {
+                AchievementUnlockPopup.show(context, a);
+              }
+            }
           }
 
           if (task.hasTimer) {
@@ -476,6 +491,18 @@ class _SpinScreenState extends State<SpinScreen> {
                   playerName: _nicknames[_currentPlayer == 1 ? 2 : 1]!,
                 );
                 ProgressionService.recordCompletion();
+                // Check achievements
+                final player = _currentPlayer == 1 ? 2 : 1; // toggled already
+                final newAchievements = AchievementService.recordAcceptance(
+                  player,
+                  categoryId: category.id,
+                  isTimed: task.hasTimer,
+                );
+                for (final a in newAchievements) {
+                  if (mounted) {
+                    AchievementUnlockPopup.show(context, a);
+                  }
+                }
                 // Confetti celebration
                 if (mounted) {
                   SoundService.celebration();
@@ -510,6 +537,17 @@ class _SpinScreenState extends State<SpinScreen> {
               playerName: completedByName,
             );
             ProgressionService.recordCompletion();
+            // Check achievements
+            final newAchievements = AchievementService.recordAcceptance(
+              completedBy,
+              categoryId: category.id,
+              isTimed: task.hasTimer,
+            );
+            for (final a in newAchievements) {
+              if (mounted) {
+                AchievementUnlockPopup.show(context, a);
+              }
+            }
             // Confetti celebration
             if (mounted) {
               SoundService.celebration();
@@ -538,6 +576,16 @@ class _SpinScreenState extends State<SpinScreen> {
             _skipCooldowns[skippedBy] = hasQuickSkip ? _skipCooldownQuickSkip : _skipCooldownMax;
           });
           _savePlayerData();
+          // Check achievements
+          List<Achievement> newAchievements = AchievementService.recordSkipEvent(skippedBy);
+          if (hasShield) {
+            newAchievements.addAll(AchievementService.recordShieldUse(skippedBy));
+          }
+          for (final a in newAchievements) {
+            if (mounted) {
+              AchievementUnlockPopup.show(context, a);
+            }
+          }
           // Record history
           HistoryService.record(
             taskId: task.id,
