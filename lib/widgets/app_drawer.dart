@@ -6,6 +6,7 @@ import '../data/sound_service.dart';
 import '../data/progression_service.dart';
 import '../screens/history_screen.dart';
 import '../screens/settings_screen.dart';
+import '../screens/shop_screen.dart';
 import '../theme/app_colors.dart';
 import 'custom_snackbar.dart';
 
@@ -113,6 +114,20 @@ class AppDrawer extends StatelessWidget {
                   // ── Bottom buttons ──
                   const Divider(color: Colors.white12, height: 1),
                   const SizedBox(height: 12),
+                  _buildDrawerButton(
+                    context,
+                    icon: Icons.store,
+                    label: 'Shop',
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const ShopScreen(player: 1),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 6),
                   _buildDrawerButton(
                     context,
                     icon: Icons.history,

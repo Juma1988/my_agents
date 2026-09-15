@@ -9,6 +9,7 @@ import '../data/category_colors.dart';
 import '../data/sound_service.dart';
 import '../data/history_service.dart';
 import '../data/progression_service.dart';
+import '../data/shop_service.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/category_card_wheel.dart';
 import '../widgets/confetti_overlay.dart';
@@ -46,6 +47,7 @@ class _SpinScreenState extends State<SpinScreen> {
 
   // Skip cooldown (per-player, persists in Hive)
   static const int _skipCooldownMax = 10;
+  static const int _skipCooldownQuickSkip = 3;
   Map<int, int> _skipCooldowns = {1: 0, 2: 0};
 
   // Session tracking (resets on full app close)
@@ -252,6 +254,13 @@ class _SpinScreenState extends State<SpinScreen> {
           // Close the bottom sheet first
           Navigator.of(context).pop();
 
+          // Check for Double Points consumable
+          final hasDoublePoints = ShopService.hasItem(_currentPlayer, 'double_points');
+          final effectivePoints = hasDoublePoints ? task.points * 2 : task.points;
+          if (hasDoublePoints) {
+            ShopService.consumeItem(_currentPlayer, 'double_points');
+          }
+
           if (task.hasTimer) {
             // Navigate to the full-screen timer for timed tasks
             Navigator.of(context)
@@ -272,10 +281,11 @@ class _SpinScreenState extends State<SpinScreen> {
                 // User completed the task — award points and toggle
                 setState(() {
                   _scores[_currentPlayer] =
-                      (_scores[_currentPlayer] ?? 0) + task.points;
+                      (_scores[_currentPlayer] ?? 0) + effectivePoints;
                 });
                 _savePlayerData();
-                _showFloatingScore(task.points, isAccept: true);
+                _showFloatingScore(effectivePoints, isAccept: true);
+                ShopService.addCoins(_currentPlayer, effectivePoints);
                 _togglePlayer();
                 // Record history
                 HistoryService.record(
@@ -285,7 +295,7 @@ class _SpinScreenState extends State<SpinScreen> {
                   categoryIcon: category.icon,
                   tier: _selectedTiers.first,
                   taskText: task.text,
-                  points: task.points,
+                  points: effectivePoints,
                   accepted: true,
                   player: _currentPlayer == 1 ? 2 : 1, // toggled already
                   playerName: _nicknames[_currentPlayer == 1 ? 2 : 1]!,
@@ -303,13 +313,14 @@ class _SpinScreenState extends State<SpinScreen> {
             // Non-timed task: award points immediately
             setState(() {
               _scores[_currentPlayer] =
-                  (_scores[_currentPlayer] ?? 0) + task.points;
+                  (_scores[_currentPlayer] ?? 0) + effectivePoints;
             });
             _savePlayerData();
-            _showFloatingScore(task.points, isAccept: true);
+            _showFloatingScore(effectivePoints, isAccept: true);
             // Record history (before toggle)
             final completedBy = _currentPlayer;
             final completedByName = _nicknames[_currentPlayer]!;
+            ShopService.addCoins(_currentPlayer, effectivePoints);
             _togglePlayer();
             HistoryService.record(
               taskId: task.id,
@@ -336,10 +347,20 @@ class _SpinScreenState extends State<SpinScreen> {
           // Penalty = task.points, same player rolls again (no toggle)
           final skippedBy = _currentPlayer;
           final skippedByName = _nicknames[_currentPlayer]!;
+
+          // Check for Task Shield — free skip, no cooldown
+          final hasShield = ShopService.hasItem(skippedBy, 'task_shield');
+          if (hasShield) {
+            ShopService.consumeItem(skippedBy, 'task_shield');
+          }
+
           setState(() {
-            _scores[_currentPlayer] = (_scores[_currentPlayer] ?? 0) - task.points;
-            // Set skip cooldown for this player
-            _skipCooldowns[skippedBy] = _skipCooldownMax;
+            if (!hasShield) {
+              _scores[_currentPlayer] = (_scores[_currentPlayer] ?? 0) - task.points;
+            }
+            // Set skip cooldown — Quick Skip skill reduces from 10 to 3
+            final hasQuickSkip = ShopService.hasSkill(skippedBy, 'quick_skip');
+            _skipCooldowns[skippedBy] = hasQuickSkip ? _skipCooldownQuickSkip : _skipCooldownMax;
           });
           _savePlayerData();
           // Record history
@@ -633,6 +654,7 @@ class _SpinScreenState extends State<SpinScreen> {
     final avatar = _avatars[player] ?? (player == 1 ? '😈' : '👿');
     final nickname = _nicknames[player] ?? 'Player $player';
     final score = _scores[player] ?? 0;
+    final coins = ShopService.getCoins(player);
     final sessionStart = _sessionStartScores[player] ?? 0;
     final delta = score - sessionStart;
 
@@ -700,6 +722,20 @@ class _SpinScreenState extends State<SpinScreen> {
                   ),
                 ),
               ],
+            ],
+          ),
+          const SizedBox(height: 2),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '🪙 $coins',
+                style: GoogleFonts.inter(
+                  color: Colors.white38,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ],
           ),
         ],
