@@ -11,7 +11,7 @@ void main() async {
   runApp(const MyApp());
 }
 
-final bool isDebug = true;
+final bool isDebug = false;
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

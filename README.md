@@ -1,17 +1,51 @@
-# handicap
+# Risk Roulette
 
-A new Flutter project.
+A couples' challenge roulette app built with Flutter.
+
+## How It Works
+
+1. **Spin** — Tap the gold button to spin the wheel of tasks
+2. **Reveal** — A task appears with its category, points, and optional timer
+3. **Accept or Skip** — Accept to earn points (and switch player), skip to lose points (and roll again)
+4. **Timer** — Timed tasks open a full-screen countdown with alarm
+5. **Score** — Players take turns; scores persist between sessions
+
+## Categories
+
+| Icon | Name | Description |
+|------|------|-------------|
+| 🏠 | Domestic | Home chores with a twist |
+| 💬 | Dirty Truth | Confession questions |
+| 🔥 | Spicy Dare | Action challenges |
+| 🎭 | Roleplay | Scenario prompts |
+| 👅 | Sensation | Touch/sensory tasks |
+| 🌀 | Wildcard | Mixed wildcards |
+| 👫 | 2 Player | Both players together |
+
+Each category has 3 tiers: **Soft** (easy), **Kink** (medium), **Entertainment** (intense).
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+```bash
+flutter pub get
+flutter run
+```
 
-A few resources to get you started if this is your first Flutter project:
+## Project Structure
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+```
+lib/
+├── main.dart                    # Entry point, Hive init
+├── theme/app_colors.dart        # Color constants
+├── models/                      # Data models
+├── data/                        # Task loader, category colors
+├── screens/                     # SpinScreen, TimerScreen
+└── widgets/                     # Wheel, drawer, buttons, snackbar
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Docs
+
+Full project documentation lives in `docs/`:
+- `docs/project-memory.md` — Architecture, decisions, persistence
+- `docs/CHANGELOG.md` — Version history
+- `docs/progress.md` — Current status and next steps
