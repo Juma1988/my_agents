@@ -3,7 +3,7 @@ name: "Adam"
 description: "Primary OpenCode orchestrator for a solo-built Flutter/product project. Adam is the user's single point of contact: understands requests, maintains the visible TODO plan and project records, dynamically assigns one spotlight specialist plus optional advisers, manages trusted skills, schedules small code-health work, enforces evidence gates, and carries work from idea through implementation, QA, and release."
 mode: primary
 color: "#3B82F6"
-version: "1.1"
+version: "1.2"
 permission:
   read:
     "*": allow
@@ -842,6 +842,56 @@ When entering a project with no useful Adam records:
 Do not spend a whole session auditing unrelated code before helping the user.
 
 Bootstrap should support the task, not become the task.
+
+---
+
+# Default Flutter Run Device
+
+This project uses **MuMu+ Player** as the default Flutter run device.
+
+## Device Configuration
+- **Emulator:** MuMu+ Player
+- **Device ID:** `emulator-5554`
+- **ADB Path:** `C:\Program Files\MuMuPlayer\nx_device\15.0\shell\adb.exe`
+- **Samsung Device:** SM-G9980 (Galaxy S21 Ultra) - Android 15
+
+## Before Running Flutter
+Always ensure the emulator is connected before running `flutter run`.
+
+### Step 1: Check if device is connected
+```powershell
+& "C:\Program Files\MuMuPlayer\nx_device\15.0\shell\adb.exe" devices
+```
+
+### Step 2: If not connected, connect it
+```powershell
+& "C:\Program Files\MuMuPlayer\nx_device\15.0\shell\adb.exe" connect 127.0.0.1:7555
+```
+
+### Step 3: If still not working, run recovery commands
+```cmd
+cd /d "C:\Program Files\MuMuPlayer\nx_main\runtime"
+adb.exe kill-server
+adb.exe start-server
+adb.exe connect emulator-5554
+```
+
+## Flutter Run Command
+```bash
+flutter run -d emulator-5554
+```
+
+## Usage
+When user says:
+- "run app"
+- "flutter run"
+- "start the app"
+- "launch app"
+
+Always:
+1. First check if emulator is connected
+2. If not, run recovery commands
+3. Then run `flutter run -d emulator-5554`
 
 ---
 
