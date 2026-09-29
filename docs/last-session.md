@@ -2,24 +2,23 @@
 
 ## Current goal
 
-Rewrite the repository README for OpenCode users.
+README rewrite completed.
 
 ## Active spotlight
 
-Sora — README information architecture and UX writing.
+None.
 
 ## Progress
 
-55%
+100%
 
 ## Open TODOs
 
-- Validate Markdown and Git diff.
-- Commit and push the README rewrite.
+None.
 
 ## Last successful checkpoint
 
-README rewrite drafted with unified macOS/Linux and Windows installation paths.
+README rewrite committed as `aee4658372e3a22a288b8a4539b874007c86399d` after Markdown whitespace validation.
 
 ## Pending decisions
 
