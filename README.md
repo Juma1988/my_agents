@@ -1,318 +1,185 @@
-# 🤖 My Agents — Your AI Dev Team
+# My Agents
 
-> A complete multi-agent system for [OpenCode](https://github.com/opencode-ai/opencode) that gives you a full software development team — from strategy to shipping.
+> **A disciplined AI development team for [OpenCode](https://opencode.ai).**
 
-**One interface. Five specialists. Zero chaos.**
+Turn one OpenCode session into a coordinated team that can take work from product thinking to verified release—without letting multiple agents compete for the same task.
 
----
-
-## 🎯 What Is This?
-
-My Agents is a production-grade agent configuration for OpenCode. It replaces the single-agent "do everything" approach with a **specialist orchestra** — six carefully scoped agents that collaborate through a single orchestrator, each owning exactly one responsibility.
-
-| Agent | Role | What It Does |
-|-------|------|-------------|
-| 🎯 **Eve** | Orchestrator | Your single point of contact. Understands requests, breaks them into work, routes to the right specialist, maintains project state, and carries work to verified completion. |
-| 🧠 **Mika** | Strategy | Product thinking, research, competitor analysis, ideation. Challenges assumptions, surfaces opportunities, recommends what to build (and what not to). |
-| 🎨 **Sora** | UI/UX Design | Flows, layouts, states, accessibility, localization, responsive behavior, design systems, UX writing, visual review. Turns intent into actionable design contracts. |
-| ⚙️ **Yuna** | Implementation | Production code across UI, state, logic, APIs, persistence, auth, navigation. Implements in small verified slices while preventing structural decay. |
-| 🧪 **Kira** | QA & Testing | Independent verification, regression, edge cases, accessibility/security checks, runtime evidence. Never trusts — always verifies. |
-| 🚀 **Rei** | Release | Release readiness, dead-code gates, build/signing/versioning, rollback, publication. Ships only with explicit authorization and verified evidence. |
+**One interface. Five specialists. One accountable orchestrator.**
 
 ---
 
-## 🏗️ How It Works
+## Why My Agents?
 
-```
-You → Eve → Spotlight Specialist (with optional Advisers) → Verified Result → You
-```
+Most multi-agent setups add more voices. My Agents adds **clear ownership**.
 
-**Core principle:** *One spotlight. Optional advisers. Eve owns the orchestra.*
+Eve is your only normal point of contact. She understands the outcome, keeps the plan and progress visible, assigns exactly one specialist to own the active work, and requires evidence before calling it complete.
 
-At any moment, exactly **one** specialist owns the work. Others may advise — but only when their input materially helps. This prevents the chaos of multiple agents fighting over the same codebase.
-
-### Dynamic Routing
-
-Eve doesn't follow a fixed pipeline. Eve routes based on what the task actually needs:
-
-```
-New UI feature     → Mika (optional) → Sora → Yuna → Kira
-Existing UI bug    → Yuna → Kira (Sora as adviser if needed)
-Product idea       → Mika only (or Mika → Sora for UX direction)
-Architecture work  → Yuna (Mika/Sora as advisers if decisions matter)
-Release            → Kira (verified) → Rei
+```text
+You → Eve → Spotlight specialist (+ optional advisers) → Verified result → You
 ```
 
-Specialists that add no value? **Skipped.**
+> **One spotlight. Optional advisers. Eve owns the orchestra.**
 
----
+That means less agent churn, fewer scope surprises, and a clear answer to: *what changed, what was verified, and what happens next?*
 
-## ✨ Key Features
+## Meet the team
 
-### 🎯 Evidence-Based Gates
-No agent can self-certify completion. Every stage has a **completion gate** — concrete evidence requirements that Eve evaluates before moving forward.
+| Agent | Owns | Brings |
+| :-- | :-- | :-- |
+| 🎯 **Eve** | Orchestration | Planning, routing, durable project context, progress visibility, evidence gates, and scope protection. |
+| 🧠 **Mika** | Strategy | Product thinking, research, trade-offs, competitor analysis, and ideation. |
+| 🎨 **Sora** | UI/UX | User flows, design systems, accessibility, localization, UX writing, and visual review. |
+| ⚙️ **Yuna** | Implementation | Production code, state, APIs, persistence, architecture, and focused developer tests. |
+| 🧪 **Kira** | Independent QA | Regression, runtime evidence, edge cases, accessibility, and security verification. |
+| 🚀 **Rei** | Release readiness | Build/version checks, signing safety, rollback readiness, dead-code gates, and authorized publishing. |
 
-### 🔄 Improvement Radar
-Every specialist continuously scans for issues, opportunities, and structural decay — then reports findings to Eve for prioritization. The radar catches what point-in-time reviews miss.
+## How it works
 
-### 🛡️ Doom-Loop Prevention
-Built-in circuit breakers prevent infinite Yuna/Kira alternation or repeated failed strategies. After two similar failures, the system stops and asks for a real decision.
+Eve routes dynamically instead of forcing every request through the same pipeline.
 
-### 📋 Visible TODO State
-The user always sees what's planned, active, complete, and blocked. No hidden work. No surprise scope changes.
+| Your request | Typical route |
+| :-- | :-- |
+| New product or feature idea | Mika → Sora → Yuna → Kira |
+| UI change | Sora → Yuna → Kira |
+| Existing bug | Yuna → Kira |
+| Architecture or data work | Yuna, with advisers only when needed |
+| “Ship it” | Kira (exact revision) → Rei |
 
-### 🔒 User Decision Authority
-Meaningful product and architecture choices always route back to you. The agents recommend — you decide.
+Specialists that do not materially improve the outcome are skipped. Advisers can inform the work, but they do not take ownership away from the spotlight specialist.
 
-### 🧰 Skill System
-Extensible skill architecture for adding specialized capabilities. Skills add expertise; agents define responsibility.
+## What you get
 
----
+- **Visible execution** — clear TODOs, progress, blockers, and scope deltas instead of hidden work.
+- **Evidence, not confidence** — completion claims are checked against concrete evidence; critical paths require runtime proof.
+- **Scope discipline** — useful discoveries are classified as required work, a small safe cleanup, radar items, or ignored noise.
+- **Decision memory** — meaningful choices are recorded once and applied consistently later.
+- **Loop protection** — repeated failures trigger a root-cause checkpoint instead of endless retries.
+- **Release control** — publication requires explicit authorization, matching QA evidence, and rollback awareness.
+- **Skill-aware workflows** — agents can discover and apply project-local skills without blurring responsibility boundaries.
 
-## 📦 Installation
+## Install
 
 ### Prerequisites
 
-- [OpenCode](https://github.com/opencode-ai/opencode) installed and configured
-- Access to your preferred LLM provider
+- [OpenCode](https://opencode.ai) installed
+- An OpenCode model provider configured
 
-### Setup
+### Add the team to a project
 
-1. **Clone this repository:**
+Clone this repository, then copy the agents and bundled skills into the project where you use OpenCode.
+
+<details>
+<summary><strong>macOS / Linux</strong></summary>
 
 ```bash
 git clone https://github.com/Juma1988/my_agents.git
+mkdir -p /path/to/your-project/.opencode/{agents,skills}
+cp my_agents/*.md /path/to/your-project/.opencode/agents/
+cp -R my_agents/skills/. /path/to/your-project/.opencode/skills/
 ```
 
-2. **Copy agent files to your OpenCode agents directory:**
+</details>
 
-```bash
-# From inside your project directory
-mkdir -p .opencode/agents
-cp path/to/my_agents/*.md .opencode/agents/
+<details>
+<summary><strong>Windows PowerShell</strong></summary>
+
+```powershell
+git clone https://github.com/Juma1988/my_agents.git
+New-Item -ItemType Directory -Force -Path "C:\path\to\your-project\.opencode\agents", "C:\path\to\your-project\.opencode\skills"
+Copy-Item .\my_agents\*.md "C:\path\to\your-project\.opencode\agents\"
+Copy-Item .\my_agents\skills\* "C:\path\to\your-project\.opencode\skills\" -Recurse
 ```
 
-3. **Or use them as project-level agents:**
+</details>
 
-```bash
-# Place directly in your project root
-cp path/to/my_agents/*.md .opencode/agents/
-```
+Your project should look like this:
 
-4. **Open your project in OpenCode** — the agents are now available.
-
-### File Structure
-
-```
+```text
 your-project/
-├── .opencode/
-│   └── agents/
-│       ├── eve.md       # Orchestrator
-│       ├── mika.md      # Strategy
-│       ├── sora.md      # UI/UX Design
-│       ├── yuna.md      # Implementation
-│       ├── kira.md      # QA & Testing
-│       └── rei.md       # Release
-└── ...
+└── .opencode/
+    ├── agents/
+    │   ├── eve.md
+    │   ├── mika.md
+    │   ├── sora.md
+    │   ├── yuna.md
+    │   ├── kira.md
+    │   └── rei.md
+    └── skills/
+        └── <bundled skills>
 ```
 
----
+Restart OpenCode after adding or changing agents or skills so it reloads the configuration. Then select **Eve** as your primary agent and describe what you want to achieve.
 
-## 🔧 Customization
+## Start with a real request
 
-### Personal Information
+Use outcome-focused prompts. Eve will turn them into a plan, keep you informed, and bring in only the expertise that helps.
 
-Edit `eve.md` to set your name, email, and company ID:
-
-```yaml
-# In eve.md frontmatter or body
-- **Name:** Your Name
-- **Email:** your@email.com
-- **Company ID:** com.yourcompany.<project_name>
+```text
+“Add a dark-mode preference that persists across app restarts.”
+“The profile save action fails while offline. Find and fix it.”
+“Review this onboarding flow before we build it.”
+“Ship the verified release to the production channel.”
 ```
 
-### Permission Boundaries
+## Customize for your environment
 
-Each agent has carefully scoped permissions. Agents can read broadly but have restricted write access:
+### Personal details
 
-| Agent | Can Write | Cannot Write |
-|-------|-----------|-------------|
-| Eve | `*` (with safety guards) | `.env`, secrets, credentials |
-| Mika | `docs/strategy/**`, `docs/decisions/**` | Production code, project records |
-| Sora | `docs/design/**`, `docs/decisions/**` | Production code, project records |
-| Yuna | `*` (with safety guards) | `.env`, secrets (within scope) |
-| Kira | `test/**`, `tests/**`, `integration_test/**`, `docs/qa/**` | Production code |
-| Rei | `*` (within release scope) | `.env`, secrets |
+Update the **User Information** section in `eve.md` with your name, email, and application-ID convention.
 
-### Adding Skills
+### Permissions
 
-Skills extend agent capabilities without changing agent responsibility. Place skills in:
+The agents include deliberate guardrails: secret files are denied, destructive Git operations require confirmation, and each specialist is constrained to its responsibility. Review the frontmatter in each agent file and adapt permissions to your environment before using the team in a sensitive project.
 
-```
+### Skills
+
+This repository bundles focused skills for Flutter implementation, UI/UX, QA, release readiness, and device-aware Flutter runs. OpenCode discovers project-local skills from:
+
+```text
 .opencode/skills/<skill-name>/SKILL.md
 ```
 
----
+Skills extend expertise. They do not replace ownership: Eve still decides who should do the work and when.
 
-## 🧠 Agent Deep Dive
+## Operating principles
 
-### Eve — The Orchestrator
+| Principle | In practice |
+| :-- | :-- |
+| **One owner at a time** | Exactly one spotlight specialist owns active specialist work. |
+| **Evidence before done** | Required checks, known scope, honest risks, and runtime proof for critical paths. |
+| **The user decides meaningful trade-offs** | Agents recommend; you retain product and architecture authority. |
+| **Change narrowly** | Safe tiny cleanups are allowed; unrelated work stays on the improvement radar. |
+| **Release is intentional** | No publishing without your explicit authorization and matching QA provenance. |
 
-Eve is the only agent you talk to. Eve:
+## Included capabilities
 
-- **Understands** what you actually want (not just what you said)
-- **Breaks** work into achievable outcomes
-- **Routes** to the right specialist at the right time
-- **Maintains** visible TODO state and project records
-- **Prevents** agent loops and ownership confusion
-- **Surfaces** suggestions without hijacking scope
+The bundled skill set covers:
 
-### Mika — Strategy & Ideation
+- Flutter architecture, performance, dependencies, data/API boundaries, security hardening, and developer testing
+- Design systems, accessibility, localization/RTL, motion, UX writing, and visual review
+- Widget, integration, regression, runtime-debugging, accessibility, and security QA
+- Release readiness, version/build validation, signing safety, rollback recovery, store publishing, and dead-code gates
 
-Mika challenges assumptions before implementation begins:
+## Safety by design
 
-- Identifies the **real problem** (not just the requested solution)
-- Researches competitors and external evidence
-- Generates meaningful alternatives with trade-off analysis
-- Runs the Improvement Radar across inspected areas
-- Recommends what to build — and what not to
+- Secrets and credentials are protected by agent permissions.
+- Force-pushes and destructive Git operations are never treated as routine.
+- Specialist handoffs have explicit completion evidence.
+- Repeated unsuccessful approaches stop for a root-cause decision instead of looping.
+- Release work is separated from normal feature completion.
 
-### Sora — UI/UX Design
+## Contributing
 
-Sora turns product intent into actionable design contracts:
+This is a personal agent configuration, built to be forked and tailored. Issues and improvements are welcome—especially changes that make the team clearer, safer, or more useful in real projects.
 
-- Defines flows, states, hierarchy, and interaction patterns
-- Enforces accessibility and localization/RTL resilience
-- Identifies reusable components and design token opportunities
-- Reviews screenshots against approved design contracts
-- Improves UX copy where wording affects clarity
+## License
 
-### Yuna — Implementation
-
-Yuna produces working code in small verified slices:
-
-- Implements approved behavior contracts
-- Keeps business logic, presentation, and persistence separated
-- Performs safe cleanup in touched code
-- Adds focused tests for meaningful new logic
-- Reports structural decay through the Improvement Radar
-
-### Kira — QA & Testing
-
-Kira independently verifies everything:
-
-- Builds risk-based test plans (not equal effort on every path)
-- Reproduces failures with exact evidence
-- Distinguishes product defects from environment failures
-- Never trusts confidence as proof
-- Verifies accessibility, security, and responsive behavior
-
-### Rei — Release & Publishing
-
-Rei ships only when everything is verified:
-
-- Validates Kira's evidence matches the exact revision
-- Performs final dead-code sweep
-- Verifies signing, versioning, and build readiness
-- Confirms rollback plan before publication
-- Publishes only with explicit user authorization
-
----
-
-## 📋 Signal Icons
-
-Each agent uses consistent scan markers:
-
-| Icon | Meaning |
-|------|---------|
-| 🎯 | Spotlight (active specialist) |
-| 👀 | Adviser |
-| 📋 | TODO |
-| ✅ | Done / Verified |
-| ⚙️ | Working |
-| 🧪 | Verify |
-| 🔒 | User Decision Required |
-| ⚠️ | Risk |
-| 💡 | Suggestion |
-| ✨ | Improvement |
-| ♻️ | Health Slice |
-| 🧰 | Skill |
-| 🧱 | Blocked |
-| 🚀 | Release |
-
----
-
-## 🔄 Workflow Examples
-
-### Feature Development
-
-```
-You: "Add a dark mode toggle to settings"
-
-Eve → Mika (quick strategy check)
-  → Sora (design the toggle, states, and persistence UX)
-    → Yuna (implement in verified slices)
-      → Kira (independent verification)
-        → Done ✅
-```
-
-### Bug Fix
-
-```
-You: "The profile save button doesn't work offline"
-
-Eve → Yuna (traces the save path, fixes the bug)
-  → Kira (verifies fix, checks edge cases)
-    → Done ✅
-```
-
-### Release
-
-```
-You: "Ship it"
-
-Eve → Kira (full verification of exact revision)
-  → Rei (preflight, build, sign, publish)
-    → Done ✅
-```
-
----
-
-## 🛡️ Safety Features
-
-- **Secrets Protection**: All agents deny read/write access to `.env`, `.key`, `.pem`, and credential files
-- **No Force-Push**: Destructive Git operations require explicit approval
-- **Scope Protection**: "While we're here" work is actively prevented
-- **Doom-Loop Prevention**: Circuit breakers stop infinite retry patterns
-- **Authorization Gates**: Publishing requires explicit user authorization
-- **Evidence Requirements**: No self-certification — every stage needs concrete proof
-
----
-
-## 📄 License
-
-Apache License 2.0 — see [LICENSE](LICENSE) for details.
-
----
-
-## 🤝 Contributing
-
-This is a personal agent configuration. Feel free to fork and customize for your own workflow.
-
-If you build something cool with these agents, I'd love to hear about it.
-
----
-
-## 🙏 Credits
-
-Built for [OpenCode](https://github.com/opencode-ai/opencode) — the AI coding assistant that lets you define how it thinks.
+Licensed under the [Apache License 2.0](LICENSE).
 
 ---
 
 <div align="center">
 
-**Built with ☕ by [Ibrahim Juma](https://github.com/Juma1988)**
-
-*From idea to production, with an AI team that actually works.*
+Built by <a href="https://github.com/Juma1988">Ibrahim Juma</a> for developers who want AI assistance with ownership, evidence, and momentum.
 
 </div>
