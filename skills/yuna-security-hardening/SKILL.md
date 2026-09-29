@@ -198,7 +198,7 @@ TEST_EVIDENCE:
 KIRA_VERIFY:
 ```
 
-## Stop / Escalate to Adam
+## Stop / Escalate to Eve
 
 Escalate when:
 - a security fix changes product behavior;

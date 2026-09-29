@@ -1,7 +1,7 @@
 ---
 name: rei-dead-code-gate
 description: >
-  Rei's final pre-publish dead-code gate for detecting likely unused/obsolete code without invalidating QA. Rei reports non-trivial candidates to Adam/Yuna instead of silently deleting production code.
+  Rei's final pre-publish dead-code gate for detecting likely unused/obsolete code without invalidating QA. Rei reports non-trivial candidates to Eve/Yuna instead of silently deleting production code.
 ---
 
 
@@ -28,6 +28,6 @@ Classify:
 Do not delete non-trivial production code.
 
 If removal/change is needed:
-Rei → Adam → Yuna → Kira → Rei preflight again.
+Rei → Eve → Yuna → Kira → Rei preflight again.
 
 This preserves QA provenance.

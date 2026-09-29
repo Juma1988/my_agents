@@ -24,4 +24,4 @@ For hangs:
 - avoid infinite waiting.
 
 Do not fix production behavior yourself.
-Return evidence to Adam.
+Return evidence to Eve.

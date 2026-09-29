@@ -29,4 +29,4 @@ For destructive actions:
 - distinguish reversible vs irreversible;
 - make cancel safe and obvious.
 
-Preserve established product voice unless Adam asks to change it.
+Preserve established product voice unless Eve asks to change it.

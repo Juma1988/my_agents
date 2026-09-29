@@ -79,7 +79,7 @@ MIGRATION_COST:
 APPROVAL_REQUIRED:
 ```
 
-## Escalate to Adam
+## Escalate to Eve
 
 Escalate:
 - new meaningful dependency;

@@ -12,7 +12,7 @@ My Agents is a production-grade agent configuration for OpenCode. It replaces th
 
 | Agent | Role | What It Does |
 |-------|------|-------------|
-| 🎯 **Adam** | Orchestrator | Your single point of contact. Understands requests, breaks them into work, routes to the right specialist, maintains project state, and carries work to verified completion. |
+| 🎯 **Eve** | Orchestrator | Your single point of contact. Understands requests, breaks them into work, routes to the right specialist, maintains project state, and carries work to verified completion. |
 | 🧠 **Mika** | Strategy | Product thinking, research, competitor analysis, ideation. Challenges assumptions, surfaces opportunities, recommends what to build (and what not to). |
 | 🎨 **Sora** | UI/UX Design | Flows, layouts, states, accessibility, localization, responsive behavior, design systems, UX writing, visual review. Turns intent into actionable design contracts. |
 | ⚙️ **Yuna** | Implementation | Production code across UI, state, logic, APIs, persistence, auth, navigation. Implements in small verified slices while preventing structural decay. |
@@ -24,16 +24,16 @@ My Agents is a production-grade agent configuration for OpenCode. It replaces th
 ## 🏗️ How It Works
 
 ```
-You → Adam → Spotlight Specialist (with optional Advisers) → Verified Result → You
+You → Eve → Spotlight Specialist (with optional Advisers) → Verified Result → You
 ```
 
-**Core principle:** *One spotlight. Optional advisers. Adam owns the orchestra.*
+**Core principle:** *One spotlight. Optional advisers. Eve owns the orchestra.*
 
 At any moment, exactly **one** specialist owns the work. Others may advise — but only when their input materially helps. This prevents the chaos of multiple agents fighting over the same codebase.
 
 ### Dynamic Routing
 
-Adam doesn't follow a fixed pipeline. He routes based on what the task actually needs:
+Eve doesn't follow a fixed pipeline. Eve routes based on what the task actually needs:
 
 ```
 New UI feature     → Mika (optional) → Sora → Yuna → Kira
@@ -50,10 +50,10 @@ Specialists that add no value? **Skipped.**
 ## ✨ Key Features
 
 ### 🎯 Evidence-Based Gates
-No agent can self-certify completion. Every stage has a **completion gate** — concrete evidence requirements that Adam evaluates before moving forward.
+No agent can self-certify completion. Every stage has a **completion gate** — concrete evidence requirements that Eve evaluates before moving forward.
 
 ### 🔄 Improvement Radar
-Every specialist continuously scans for issues, opportunities, and structural decay — then reports findings to Adam for prioritization. The radar catches what point-in-time reviews miss.
+Every specialist continuously scans for issues, opportunities, and structural decay — then reports findings to Eve for prioritization. The radar catches what point-in-time reviews miss.
 
 ### 🛡️ Doom-Loop Prevention
 Built-in circuit breakers prevent infinite Yuna/Kira alternation or repeated failed strategies. After two similar failures, the system stops and asks for a real decision.
@@ -107,7 +107,7 @@ cp path/to/my_agents/*.md .opencode/agents/
 your-project/
 ├── .opencode/
 │   └── agents/
-│       ├── adam.md      # Orchestrator
+│       ├── eve.md       # Orchestrator
 │       ├── mika.md      # Strategy
 │       ├── sora.md      # UI/UX Design
 │       ├── yuna.md      # Implementation
@@ -122,10 +122,10 @@ your-project/
 
 ### Personal Information
 
-Edit `adam.md` to set your name, email, and company ID:
+Edit `eve.md` to set your name, email, and company ID:
 
 ```yaml
-# In adam.md frontmatter or body
+# In eve.md frontmatter or body
 - **Name:** Your Name
 - **Email:** your@email.com
 - **Company ID:** com.yourcompany.<project_name>
@@ -137,7 +137,7 @@ Each agent has carefully scoped permissions. Agents can read broadly but have re
 
 | Agent | Can Write | Cannot Write |
 |-------|-----------|-------------|
-| Adam | `*` (with safety guards) | `.env`, secrets, credentials |
+| Eve | `*` (with safety guards) | `.env`, secrets, credentials |
 | Mika | `docs/strategy/**`, `docs/decisions/**` | Production code, project records |
 | Sora | `docs/design/**`, `docs/decisions/**` | Production code, project records |
 | Yuna | `*` (with safety guards) | `.env`, secrets (within scope) |
@@ -156,9 +156,9 @@ Skills extend agent capabilities without changing agent responsibility. Place sk
 
 ## 🧠 Agent Deep Dive
 
-### Adam — The Orchestrator
+### Eve — The Orchestrator
 
-Adam is the only agent you talk to. He:
+Eve is the only agent you talk to. Eve:
 
 - **Understands** what you actually want (not just what you said)
 - **Breaks** work into achievable outcomes
@@ -249,7 +249,7 @@ Each agent uses consistent scan markers:
 ```
 You: "Add a dark mode toggle to settings"
 
-Adam → Mika (quick strategy check)
+Eve → Mika (quick strategy check)
   → Sora (design the toggle, states, and persistence UX)
     → Yuna (implement in verified slices)
       → Kira (independent verification)
@@ -261,7 +261,7 @@ Adam → Mika (quick strategy check)
 ```
 You: "The profile save button doesn't work offline"
 
-Adam → Yuna (traces the save path, fixes the bug)
+Eve → Yuna (traces the save path, fixes the bug)
   → Kira (verifies fix, checks edge cases)
     → Done ✅
 ```
@@ -271,7 +271,7 @@ Adam → Yuna (traces the save path, fixes the bug)
 ```
 You: "Ship it"
 
-Adam → Kira (full verification of exact revision)
+Eve → Kira (full verification of exact revision)
   → Rei (preflight, build, sign, publish)
     → Done ✅
 ```

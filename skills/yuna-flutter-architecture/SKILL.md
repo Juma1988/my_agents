@@ -211,9 +211,9 @@ Prefer:
 
 Avoid "clean architecture rewrite."
 
-## Adam Approval Required
+## Eve Approval Required
 
-Return to Adam before:
+Return to Eve before:
 - replacing state management;
 - introducing app-wide layers;
 - changing storage strategy;

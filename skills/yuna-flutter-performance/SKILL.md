@@ -124,7 +124,7 @@ SCOPE:
 
 ## Escalate
 
-Return to Adam before:
+Return to Eve before:
 - replacing major libraries;
 - introducing complex caching infrastructure;
 - background services;

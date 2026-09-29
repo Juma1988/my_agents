@@ -97,7 +97,7 @@ For migrations:
 - test data preservation;
 - failure behavior.
 
-Medium/Large migrations require Adam visibility.
+Medium/Large migrations require Eve visibility.
 
 ## Sync / Offline
 
