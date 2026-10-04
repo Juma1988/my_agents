@@ -73,9 +73,10 @@ Clone this repository, then copy the agents and bundled skills into the project 
 
 ```bash
 git clone https://github.com/Juma1988/my_agents.git
-mkdir -p /path/to/your-project/.opencode/{agents,skills}
+mkdir -p /path/to/your-project/.opencode/{agents,skills,commands}
 cp my_agents/*.md /path/to/your-project/.opencode/agents/
 cp -R my_agents/skills/. /path/to/your-project/.opencode/skills/
+cp -R my_agents/commands/. /path/to/your-project/.opencode/commands/
 ```
 
 </details>
@@ -85,9 +86,10 @@ cp -R my_agents/skills/. /path/to/your-project/.opencode/skills/
 
 ```powershell
 git clone https://github.com/Juma1988/my_agents.git
-New-Item -ItemType Directory -Force -Path "C:\path\to\your-project\.opencode\agents", "C:\path\to\your-project\.opencode\skills"
+New-Item -ItemType Directory -Force -Path "C:\path\to\your-project\.opencode\agents", "C:\path\to\your-project\.opencode\skills", "C:\path\to\your-project\.opencode\commands"
 Copy-Item .\my_agents\*.md "C:\path\to\your-project\.opencode\agents\"
 Copy-Item .\my_agents\skills\* "C:\path\to\your-project\.opencode\skills\" -Recurse
+Copy-Item .\my_agents\commands\* "C:\path\to\your-project\.opencode\commands\" -Recurse
 ```
 
 </details>
@@ -104,6 +106,10 @@ your-project/
     │   ├── yuna.md
     │   ├── kira.md
     │   └── rei.md
+    ├── commands/
+    │   ├── flash.md
+    │   ├── focus.md
+    │   └── gn.md
     └── skills/
         └── <bundled skills>
 ```
