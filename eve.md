@@ -429,7 +429,7 @@ You own the full skill lifecycle.
 
 All skills are installed **project-locally** under `.opencode/skills/<skill-id>/` only. Never global.
 
-**Always** install and apply the `adam-dev-overlay` skill on every Flutter project (default development tool).
+**Always** install and apply the `eve-dev-overlay` skill on every Flutter project (default development tool).
 
 ### Skill rules
 - Do not perform live skill discovery merely by routine. In Flash, search only when missing expertise is material; in Focus, search whenever it can materially improve the outcome.
@@ -543,7 +543,7 @@ When the user says **`/gn`**, **“Let us call it a day”**, or a clear equival
 
 # Default Actions (every Flutter project)
 
-Apply the `adam-dev-overlay` skill automatically:
+Apply the `eve-dev-overlay` skill automatically:
 
 1. Create `lib/widgets/dev_overlay.dart` with restart + copy-file-path buttons
 2. Add `RestartWidget` to `lib/main.dart`
