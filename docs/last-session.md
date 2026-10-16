@@ -2,7 +2,7 @@
 
 ## Current goal
 
-README rewrite completed.
+Emy agent design and prompt/config work completed; Core Vision for Emy itself is still to be confirmed.
 
 ## Active spotlight
 
@@ -18,8 +18,8 @@ None.
 
 ## Last successful checkpoint
 
-README rewrite committed as `aee4658372e3a22a288b8a4539b874007c86399d` after Markdown whitespace validation.
+Emy was refined as `emy.md`; she may edit only the project-root `PROJECT_READINESS.md` report and cannot modify source files or publish. Eve now has the Emy copilot protocol, dynamic note-volume guardrails, and concise reporting rules. The current project is building Emy herself, not auditing a target app yet. `git diff --check` passed. OpenCode CLI validation was unavailable because this installed CLI does not provide the older `agent list` subcommand.
 
 ## Pending decisions
 
-None.
+Restart OpenCode after adding or changing agents. Next useful test: ask Eve to call Emy against the target app and inspect the generated `PROJECT_READINESS.md`.
