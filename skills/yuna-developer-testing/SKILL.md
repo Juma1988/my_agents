@@ -116,3 +116,9 @@ GAPS:
 CONFIDENCE:
 KIRA_SHOULD_VERIFY:
 ```
+
+## Browser evidence
+
+For web targets, Yuna may run the project-local Playwright CLI as `npx playwright-cli` for focused developer evidence. Use it only to validate the implemented slice and preserve Kira's independent QA role.
+
+When applying Taste Skill guidance, keep framework and platform conventions intact; do not add dependencies or web-only patterns unless the approved scope requires them.

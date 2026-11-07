@@ -25,3 +25,7 @@ For hangs:
 
 Do not fix production behavior yourself.
 Return evidence to Eve.
+
+## Browser targets
+
+For web runtime investigations, use `kira-playwright-cli` and the project-local command `npx playwright-cli`. Record the URL, viewport, session state, reproduction steps, and relevant console or network evidence. Close sessions after the investigation.

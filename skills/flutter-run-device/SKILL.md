@@ -1,3 +1,8 @@
+---
+name: flutter-run-device
+description: Use when running a Flutter app in this project and a known MuMu+ Player emulator target or ADB recovery is needed.
+---
+
 # Flutter Run Device
 
 ## Purpose

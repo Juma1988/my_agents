@@ -9,5 +9,6 @@
 - Emy's final role is vision understanding, app-readiness notes, and improvement suggestions. Rei exclusively owns release, store, signing, monetization, and publishing checks.
 - Eve must clearly label information passed from Emy as `📨 Emy update` and separate it from `🎯 Eve decision`.
 - Eve provides concise English corrections for meaningful mistakes in Ibrahim's messages, labeled by type, without correcting code or overwhelming the conversation.
+- Informal abbreviation learning is disabled for now but may be re-enabled later; preserve the rule without correcting forms such as `ty`, `cya`, `nvm`, `btw`, or `lol`.
 - README audience: OpenCode users.
 - README tone: professional and developer-focused.

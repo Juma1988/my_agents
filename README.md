@@ -12,7 +12,7 @@ Turn one OpenCode session into a coordinated team that can take work from produc
 
 Most multi-agent setups add more voices. My Agents adds **clear ownership**.
 
-Eve is your only normal point of contact. She understands the outcome, keeps the plan and progress visible, assigns exactly one specialist to own the active work, and requires evidence before calling it complete.
+Eve is your everyday point of contact. She understands the outcome, keeps the plan and progress visible, assigns exactly one specialist to own the active work, and requires evidence before calling it complete. Lana is an opt-in primary agent for testing a stricter checkpoint-and-lock workflow; she is not the default.
 
 ```text
 You → Eve → Spotlight specialist (+ optional advisers) → Verified result → You
@@ -26,16 +26,18 @@ That means less agent churn, fewer scope surprises, and a clear answer to: *what
 
 | Agent | Owns | Brings |
 | :-- | :-- | :-- |
-| 🎯 **Eve** | Orchestration | Planning, routing, durable project context, progress visibility, evidence gates, and scope protection. |
+| 🎯 **Eve** | Everyday orchestration | Planning, routing, durable project context, progress visibility, evidence gates, and scope protection. |
+| 🔒 **Lana** (opt-in) | Checkpointed orchestration | Prompt-level task ownership locks, durable checkpoints, approval/risk gates, bounded retries, role-scoped skills, and structured handoffs. |
 | 🧠 **Mika** | Strategy | Product thinking, research, trade-offs, competitor analysis, and ideation. |
 | 🎨 **Sora** | UI/UX | User flows, design systems, accessibility, localization, UX writing, and visual review. |
 | ⚙️ **Yuna** | Implementation | Production code, state, APIs, persistence, architecture, and focused developer tests. |
 | 🧪 **Kira** | Independent QA | Regression, runtime evidence, edge cases, accessibility, and security verification. |
 | 🚀 **Rei** | Release readiness | Build/version checks, signing safety, rollback readiness, dead-code gates, and authorized publishing. |
+| 🔎 **Emy** | App readiness audit | Project inventory, publish gates, monetization readiness, evidence tracking, and `PROJECT_READINESS.md` maintenance. |
 
 ## How it works
 
-Eve routes dynamically instead of forcing every request through the same pipeline.
+Eve routes dynamically instead of forcing every request through the same pipeline. Lana uses the same specialist boundaries when selected, with an additional single-owner lock and checkpoint protocol.
 
 | Your request | Typical route |
 | :-- | :-- |
@@ -44,6 +46,7 @@ Eve routes dynamically instead of forcing every request through the same pipelin
 | Existing bug | Yuna → Kira |
 | Architecture or data work | Yuna, with advisers only when needed |
 | “Ship it” | Kira (exact revision) → Rei |
+| “Is the app ready to publish?” | Emy → Eve → Yuna/Kira/Rei as needed |
 
 Specialists that do not materially improve the outcome are skipped. Advisers can inform the work, but they do not take ownership away from the spotlight specialist.
 
@@ -101,11 +104,13 @@ your-project/
 └── .opencode/
     ├── agents/
     │   ├── eve.md
+    │   ├── lana.md              # optional; not the default
     │   ├── mika.md
     │   ├── sora.md
     │   ├── yuna.md
     │   ├── kira.md
-    │   └── rei.md
+    │   ├── rei.md
+    │   └── emy.md
     ├── commands/
     │   ├── flash.md
     │   ├── focus.md
@@ -114,7 +119,7 @@ your-project/
         └── <bundled skills>
 ```
 
-Restart OpenCode after adding or changing agents or skills so it reloads the configuration. Then select **Eve** as your primary agent and describe what you want to achieve.
+Restart OpenCode after adding or changing agents or skills so it reloads the configuration. Select **Eve** for normal work. To test Lana, select **Lana** explicitly; she does not change OpenCode's default agent and provides prompt-level controls only—not a Paperclip server, dashboard, scheduler, or budget telemetry.
 
 ## Start with a real request
 
@@ -131,7 +136,7 @@ Use outcome-focused prompts. Eve will turn them into a plan, keep you informed, 
 
 ### Personal details
 
-Update the **User Information** section in `eve.md` with your name, email, and application-ID convention.
+Update the **User Information** section in `eve.md` with your name, email, and application-ID convention when that section is present.
 
 ### Permissions
 
@@ -145,7 +150,7 @@ This repository bundles focused skills for Flutter implementation, UI/UX, QA, re
 .opencode/skills/<skill-name>/SKILL.md
 ```
 
-Skills extend expertise. They do not replace ownership: Eve still decides who should do the work and when.
+Skills extend expertise. They do not replace ownership: Eve decides who should do the work and when. When Lana is explicitly selected, she enforces the same boundaries with role-scoped skill use and one locked specialist task at a time.
 
 ## Operating principles
 
@@ -156,6 +161,7 @@ Skills extend expertise. They do not replace ownership: Eve still decides who sh
 | **The user decides meaningful trade-offs** | Agents recommend; you retain product and architecture authority. |
 | **Change narrowly** | Safe tiny cleanups are allowed; unrelated work stays on the improvement radar. |
 | **Release is intentional** | No publishing without your explicit authorization and matching QA provenance. |
+| **Lana is opt-in** | Lana is selected explicitly for checkpointed orchestration testing; Eve remains the everyday primary agent. |
 
 ## Included capabilities
 
