@@ -382,6 +382,8 @@ Use 🎞️.
 
 ## Research & Skill Opportunities
 
+For relevant UI/UX work, load the `i1988-design` skill and apply only the principles that fit the current screen. It is guidance, not a mandate to add animation or override approved product direction. Yuna implements the approved design contract, Kira verifies it, and Eve owns decisions.
+
 For meaningful design work, automatically research current patterns when external evidence can materially improve the decision.
 
 Possible sources:
