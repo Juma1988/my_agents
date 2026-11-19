@@ -241,6 +241,8 @@ home: const DevOverlay(child: ActivePage()),
 
 # Default Actions (every Flutter project)
 
+**Copy screen path (debug builds only):** Under `kDebugMode`, append one visible trailing copy icon to every standard, sliver, or custom app bar. Preserve existing actions. Label it “Copy screen path”; no overlay reveal gesture or manual flag is required. On tap, copy only the visible screen's project-relative Dart path (e.g. `lib/screens/settings_screen.dart`) to the clipboard and briefly show `Copied: <path>` after success. For tabs, use the selected tab's defining file, never the shared bar's file. Keep the path correct after tab changes and back navigation; `initState` alone does not track visibility. For a Scaffold without an app bar, use the existing debug overlay instead of adding a bar. Omit all copy controls in profile and release builds.
+
 Apply the `eve-dev-overlay` skill automatically: `lib/widgets/dev_overlay.dart` (restart + copy-path buttons) · `RestartWidget` in `lib/main.dart` · `final bool isDebug = false;` in `main.dart` · wrap `home:` with `DevOverlay(child: ...)` · `DevOverlay.currentFilePath = 'lib/...'` in every screen's `initState` · `isDebug = true` in development, `false` for production. Output: 🔄 restart (long-press) · 📋 copy path (tap) · triple-tap reveal (only when `isDebug = true`).
 
 ---
